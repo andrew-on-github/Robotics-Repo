@@ -197,17 +197,19 @@ void controllerScreen(){
   int minutesRemaining;
   int secondsRemaining;
   
-  //toggle so that temp warnings will flash
+
   bool toggle = false;
+
   string highestTempMotor; 
   
-  //array of motors
-  //probably should not use this for anything other than temp monitor, seems like that would be bad
   motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
   string motorNames[4] = {"Front Left", "Back Left", "Front Right", "Back Right"};
-  //std::string hiMotor = "";
+
   int hiMotor = 0;
-  int warningTemp = 55; //failure temperature of motors, requires adjustment
+  int warningTemp = 55; //temperature at which the brain throttles control
+
+  Brain.Timer.reset();
+
   while(true){
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
     minutesRemaining = ((int) totalSecondsRemaining % 60);
@@ -215,8 +217,6 @@ void controllerScreen(){
 
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
-    
-    
 
     //calculating highest motor temp
     for(int i = 0; i<4; i++){
@@ -238,10 +238,9 @@ void controllerScreen(){
     Controller1.Screen.newLine();
     Controller1.Screen.print("Highest temp of drivetrain motors: ");
     Controller1.Screen.print(hiTemp);
-
     Controller1.Screen.newLine();
 
-    if(totalSecondsRemaining == 30){
+    if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
     }
     else if(hiTemp > warningTemp){
@@ -249,7 +248,7 @@ void controllerScreen(){
       Controller1.rumble(rumblePulse);
       if(!toggle){
         
-        //i'm aware that this is absolutely disgusting but theres a bug in the vexcode api that makes it necessary :(
+        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
 
         if (hiMotor == 0) {
           Controller1.Screen.print("Left Front");
@@ -261,7 +260,7 @@ void controllerScreen(){
           Controller1.Screen.print("Right Front");
         }
         else if(hiMotor == 3){
-          Controller1.Screen.print("Right back");
+          Controller1.Screen.print("Right Back");
         }
         Controller1.Screen.print(" temperature warning!!");
       }
@@ -291,13 +290,14 @@ void usercontrol(void) {
 
 
   //printing roboknights logo
-  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 0, 0);
+  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //default deadzone value 
   int deadzone = 3;
 
   int leftMotorSpeed;
   int rightMotorSpeed;
+  int amogus = 4;
 
   // User control code here, inside the loop 
   while (true) {
@@ -306,7 +306,7 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
-
+    //test
     //checking deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
