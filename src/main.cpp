@@ -297,6 +297,7 @@ void usercontrol(void) {
 
   int leftMotorSpeed;
   int rightMotorSpeed;
+
   int amogus = 4;
 
   // User control code here, inside the loop 
