@@ -149,7 +149,11 @@ void autonomous(void) {
 while(true){
   switch(selectedAuto){
     case 0:
-      Brain.Screen.print("0");
+      Brain.Screen.print("Running Autonomous 0");
+      LeftBackMotor.spin(fwd);
+      LeftFrontMotor.spin(fwd);
+      RightBackMotor.spin(reverse);
+      RightBackMotor.spin(reverse);
       break;
     
     case 1:
