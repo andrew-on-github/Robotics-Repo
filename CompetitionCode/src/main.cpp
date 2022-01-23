@@ -198,7 +198,7 @@ while(true){
 /*---------------------------------------------------------------------------*/
 
 //method to control controller screen. currently has temp monitoring, plan to implement timer. should do multithready stuff with it, if you hate yourself, like i do. :)
-void controllerScreen(){
+/*void controllerScreen(){
   double avgTemp;
   double hiTemp;
   
@@ -264,8 +264,12 @@ void controllerScreen(){
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
         }
+<<<<<<< HEAD:CompetitionCode/src/main.cpp
 
         Controller1.Screen.print(" WARN");
+=======
+        Controller1.Screen.print(" warn");
+>>>>>>> a72ac5a (commented out all unstable features. this branch should only contained THOROUGHLY TESTED FUNCTIONAL FEATURES. Everything else to proto branch.):src/main.cpp
       }
       toggle = !toggle;
     }
@@ -291,18 +295,18 @@ void controllerScreen(){
     //clearing screen to make room for next values
     Controller1.Screen.clearScreen();
   }
-  }
+  }*/
 
 void usercontrol(void) {
 
-  thread UIControl(controllerScreen);
+  //thread UIControl(controllerScreen);
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
 
   //printing roboknights logo
-  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
+  //Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
 
@@ -349,25 +353,25 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
-    if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonB.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
-    }
+    // if(Controller1.ButtonR1.pressing()){
+    //   IntakeMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonB.pressing()){
+    //   IntakeMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   IntakeMotor.setVelocity(0, percent);
+    // }
 
-    if(Controller1.ButtonL1.pressing()){
-      LiftMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonL2.pressing()){
-      LiftMotor.setVelocity(-100, percent);
-    }
-    else{
-      LiftMotor.setVelocity(0, percent);
-    }
+    // if(Controller1.ButtonL1.pressing()){
+    //   LiftMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonL2.pressing()){
+    //   LiftMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   LiftMotor.setVelocity(0, percent);
+    //}
 
 //todo: make this work
     if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
@@ -398,6 +402,7 @@ void usercontrol(void) {
 
 
     clampLast = Controller1.ButtonR2.pressing();
+
 
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
