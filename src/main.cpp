@@ -17,6 +17,10 @@
 // LeftBackMotor        motor         2               
 // RightFrontMotor      motor         9               
 // RightBackMotor       motor         10              
+// ClampPiston          digital_out   C               
+// IntakeMotor          motor         11              
+// LiftMotor            motor         12              
+// MobileGoalMotor      motor         13              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -292,13 +296,17 @@ void usercontrol(void) {
   //printing roboknights logo
   Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
+  //declaring and initializing clamp variables
+  bool clamp;
+  bool clampLast = false;
+
+
   //default deadzone value 
   int deadzone = 3;
 
+  //declaring motor speed vars
   int leftMotorSpeed;
   int rightMotorSpeed;
-
-  int amogus = 4;
 
   // User control code here, inside the loop 
   while (true) {
@@ -332,12 +340,54 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
+    if(Controller1.ButtonR1.pressing()){
+      IntakeMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonB.pressing()){
+      IntakeMotor.setVelocity(-100, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
+    if(Controller1.ButtonL1.pressing()){
+      LiftMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      LiftMotor.setVelocity(-100, percent);
+    }
+    else{
+      LiftMotor.setVelocity(0, percent);
+    }
+
+//todo: make this work
+    if(Controller1.ButtonR2.pressing() != clampLast){
+      clamp = Controller1.ButtonR2.pressing();
+    }
+
+    if(Controller1.ButtonY.pressing()){
+      MobileGoalMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonDown.pressing()){
+      MobileGoalMotor.setVelocity(-100, percent);
+    }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
+    }
     //telling motors to spin
+
     LeftBackMotor.spin(fwd);
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
+    IntakeMotor.spin(fwd);
+    LiftMotor.spin(fwd);
+    MobileGoalMotor.spin(fwd);
+    ClampPiston.set(clamp);
+
+
+    clampLast = Controller1.ButtonR2.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }

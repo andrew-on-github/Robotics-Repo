@@ -15,6 +15,10 @@ motor LeftFrontMotor = motor(PORT1, ratio18_1, false);
 motor LeftBackMotor = motor(PORT2, ratio18_1, false);
 motor RightFrontMotor = motor(PORT9, ratio18_1, false);
 motor RightBackMotor = motor(PORT10, ratio18_1, false);
+digital_out ClampPiston = digital_out(Brain.ThreeWirePort.C);
+motor IntakeMotor = motor(PORT11, ratio18_1, false);
+motor LiftMotor = motor(PORT12, ratio18_1, false);
+motor MobileGoalMotor = motor(PORT13, ratio18_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
