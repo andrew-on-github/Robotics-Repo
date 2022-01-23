@@ -214,6 +214,8 @@ void controllerScreen(){
 
   Brain.Timer.reset();
 
+  
+
   while(true){
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
     minutesRemaining = ((int) totalSecondsRemaining % 60);
@@ -237,10 +239,10 @@ void controllerScreen(){
     Controller1.Screen.print(":");
     Controller1.Screen.print(secondsRemaining);
     Controller1.Screen.setCursor(1,10);
-    Controller1.Screen.print("Average temp of drivetrain motors: ");
+    Controller1.Screen.print("AVG: ");
     Controller1.Screen.print(avgTemp);
     Controller1.Screen.newLine();
-    Controller1.Screen.print("Highest temp of drivetrain motors: ");
+    Controller1.Screen.print("HI: ");
     Controller1.Screen.print(hiTemp);
     Controller1.Screen.newLine();
 
@@ -255,18 +257,18 @@ void controllerScreen(){
         //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
 
         if (hiMotor == 0) {
-          Controller1.Screen.print("Left Front");
+          Controller1.Screen.print("LF");
         }
         else if(hiMotor == 1){
-          Controller1.Screen.print("Left Back");
+          Controller1.Screen.print("LB");
         }
         else if(hiMotor == 2){
-          Controller1.Screen.print("Right Front");
+          Controller1.Screen.print("RF");
         }
         else if(hiMotor == 3){
-          Controller1.Screen.print("Right Back");
+          Controller1.Screen.print("RB");
         }
-        Controller1.Screen.print(" temperature warning!!");
+        Controller1.Screen.print(" warn");
       }
       toggle = !toggle;
     }
@@ -284,7 +286,7 @@ void controllerScreen(){
 
 void usercontrol(void) {
 
-  thread UIControl(controllerScreen);
+  //thread UIControl(controllerScreen);
 
   //need to implement, should run at the same time as main with multithreading stuff
   //task tempWarning = task(tempMonitor);
@@ -294,10 +296,10 @@ void usercontrol(void) {
 
 
   //printing roboknights logo
-  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
+  //Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
-  bool clamp;
+  bool clamp = false;
   bool clampLast = false;
 
 
@@ -310,7 +312,8 @@ void usercontrol(void) {
 
   // User control code here, inside the loop 
   while (true) {
-
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(0,0);
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
@@ -361,8 +364,8 @@ void usercontrol(void) {
     }
 
 //todo: make this work
-    if(Controller1.ButtonR2.pressing() != clampLast){
-      clamp = Controller1.ButtonR2.pressing();
+    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+      clamp = !clamp;
     }
 
     if(Controller1.ButtonY.pressing()){
@@ -385,6 +388,7 @@ void usercontrol(void) {
     LiftMotor.spin(fwd);
     MobileGoalMotor.spin(fwd);
     ClampPiston.set(clamp);
+    Brain.Screen.print(clamp);
 
 
     clampLast = Controller1.ButtonR2.pressing();
