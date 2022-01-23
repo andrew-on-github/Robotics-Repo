@@ -193,7 +193,7 @@ while(true){
 /*---------------------------------------------------------------------------*/
 
 //method to control controller screen. currently has temp monitoring, plan to implement timer. should do multithready stuff with it, if you hate yourself, like i do. :)
-void controllerScreen(){
+/*void controllerScreen(){
   double avgTemp;
   double hiTemp;
   
@@ -255,18 +255,18 @@ void controllerScreen(){
         //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
 
         if (hiMotor == 0) {
-          Controller1.Screen.print("Left Front");
+          Controller1.Screen.print("LF");
         }
         else if(hiMotor == 1){
-          Controller1.Screen.print("Left Back");
+          Controller1.Screen.print("LB");
         }
         else if(hiMotor == 2){
-          Controller1.Screen.print("Right Front");
+          Controller1.Screen.print("RF");
         }
         else if(hiMotor == 3){
-          Controller1.Screen.print("Right Back");
+          Controller1.Screen.print("RB");
         }
-        Controller1.Screen.print(" temperature warning!!");
+        Controller1.Screen.print(" warn");
       }
       toggle = !toggle;
     }
@@ -280,11 +280,11 @@ void controllerScreen(){
     //clearing screen to make room for next values
     Controller1.Screen.clearScreen();
   }
-  }
+  }*/
 
 void usercontrol(void) {
 
-  thread UIControl(controllerScreen);
+  //thread UIControl(controllerScreen);
 
   //need to implement, should run at the same time as main with multithreading stuff
   //task tempWarning = task(tempMonitor);
@@ -294,14 +294,16 @@ void usercontrol(void) {
 
 
   //printing roboknights logo
-  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
+  //Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
-  bool clamp;
-  bool clampLast = false;
+  //bool clamp;
+  //bool clampLast = false;
 
 
   //default deadzone value 
+  //want this to be as low as possible without any drift
+  //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
   int deadzone = 3;
 
   //declaring motor speed vars
@@ -340,54 +342,54 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
-    if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonB.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
-    }
+    // if(Controller1.ButtonR1.pressing()){
+    //   IntakeMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonB.pressing()){
+    //   IntakeMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   IntakeMotor.setVelocity(0, percent);
+    // }
 
-    if(Controller1.ButtonL1.pressing()){
-      LiftMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonL2.pressing()){
-      LiftMotor.setVelocity(-100, percent);
-    }
-    else{
-      LiftMotor.setVelocity(0, percent);
-    }
+    // if(Controller1.ButtonL1.pressing()){
+    //   LiftMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonL2.pressing()){
+    //   LiftMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   LiftMotor.setVelocity(0, percent);
+    //}
 
 //todo: make this work
-    if(Controller1.ButtonR2.pressing() != clampLast){
-      clamp = Controller1.ButtonR2.pressing();
-    }
+    // if(Controller1.ButtonR2.pressing() != clampLast){
+    //   clamp = Controller1.ButtonR2.pressing();
+    // }
 
-    if(Controller1.ButtonY.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonDown.pressing()){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else{
-      MobileGoalMotor.setVelocity(0, percent);
-    }
-    //telling motors to spin
+    // if(Controller1.ButtonY.pressing()){
+    //   MobileGoalMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonDown.pressing()){
+    //   MobileGoalMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   MobileGoalMotor.setVelocity(0, percent);
+    // }
+    // //telling motors to spin
 
-    LeftBackMotor.spin(fwd);
-    LeftFrontMotor.spin(fwd);
-    RightBackMotor.spin(fwd);
-    RightFrontMotor.spin(fwd);
+    // LeftBackMotor.spin(fwd);
+    // LeftFrontMotor.spin(fwd);
+    // RightBackMotor.spin(fwd);
+    // RightFrontMotor.spin(fwd);
 
-    IntakeMotor.spin(fwd);
-    LiftMotor.spin(fwd);
-    MobileGoalMotor.spin(fwd);
-    ClampPiston.set(clamp);
+    // IntakeMotor.spin(fwd);
+    // LiftMotor.spin(fwd);
+    // MobileGoalMotor.spin(fwd);
+    // ClampPiston.set(clamp);
 
 
-    clampLast = Controller1.ButtonR2.pressing();
+    // clampLast = Controller1.ButtonR2.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
