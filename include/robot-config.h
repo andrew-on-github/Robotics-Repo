@@ -14,6 +14,8 @@ extern digital_out ClampPiston;
 extern motor IntakeMotor;
 extern motor LiftMotor;
 extern motor MobileGoalMotor;
+extern digital_in TestJump;
+extern digital_in AutoTest;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

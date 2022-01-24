@@ -21,6 +21,8 @@
 // IntakeMotor          motor         11              
 // LiftMotor            motor         12              
 // MobileGoalMotor      motor         13              
+// TestJump             digital_in    D               
+// AutoTest             digital_in    E               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -128,6 +130,8 @@ void pre_auton(void) {
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
   }
+  Brain.Screen.clearScreen();
+  Brain.Timer.reset();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -216,6 +220,7 @@ void controllerScreen(){
   
 
   while(true){
+    //timer calculations
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
     minutesRemaining = ((int) totalSecondsRemaining % 60);
     secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
@@ -233,20 +238,11 @@ void controllerScreen(){
 
 
 
-    //print statements
-    Controller1.Screen.print(minutesRemaining);
-    Controller1.Screen.print(":");
-    Controller1.Screen.print(secondsRemaining);
-    Controller1.Screen.setCursor(1,10);
-    Controller1.Screen.print("AVG: ");
-    Controller1.Screen.print(avgTemp);
-    Controller1.Screen.newLine();
-    Controller1.Screen.print("HI: ");
-    Controller1.Screen.print(hiTemp);
-    Controller1.Screen.newLine();
-
+    //Controller commands
+    //time takes precedence, followed by temp warning, follwoed by everything else
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
+      Controller1.Screen.print("TIME WARN");
     }
     else if(hiTemp > warningTemp){
       //rumbling controller if motor temps go above threshold
@@ -270,6 +266,18 @@ void controllerScreen(){
         Controller1.Screen.print(" WARN");
       }
       toggle = !toggle;
+    }
+    else{
+      Controller1.Screen.print(minutesRemaining);
+      Controller1.Screen.print(":");
+      Controller1.Screen.print(secondsRemaining);
+      Controller1.Screen.setCursor(1,10);
+      Controller1.Screen.print("AVG: ");
+      Controller1.Screen.print(avgTemp);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("HI: ");
+      Controller1.Screen.print(hiTemp);
+      Controller1.Screen.newLine();
     }
 
 
@@ -406,6 +414,30 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
+
+  //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
+  if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
+    while(1){
+      while(!Controller1.ButtonR2.pressing()){
+        if(Controller1.ButtonA.pressing()){
+          selectedAuto = 0;
+        }
+        else if(Controller1.ButtonB.pressing()){
+          selectedAuto = 1;
+        }
+        else if(Controller1.ButtonX.pressing()){
+          selectedAuto = 2;
+        }
+        else if(Controller1.ButtonY.pressing()){
+          selectedAuto = 3;
+        }
+    }
+   }
+    autonomous();
+  }
+  else if(TestJump && !Competition.isCompetitionSwitch()){
+    usercontrol();
+  }
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
