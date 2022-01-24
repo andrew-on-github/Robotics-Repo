@@ -53,7 +53,7 @@ void pre_auton(void) {
   bool selected = false;
 
   
-  while(true){
+  while(!Competition.isAutonomous() && !Competition.isDriverControl()){
 
     if(MenuCycle.pressing() && !selected){
       if(selectedAuto > 2){
@@ -207,7 +207,6 @@ void controllerScreen(){
   string highestTempMotor; 
   
   motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
-  string motorNames[4] = {"Front Left", "Back Left", "Front Right", "Back Right"};
 
   int hiMotor = 0;
   int warningTemp = 55; //temperature at which the brain throttles control
@@ -268,7 +267,7 @@ void controllerScreen(){
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
         }
-        Controller1.Screen.print(" warn");
+        Controller1.Screen.print(" WARN");
       }
       toggle = !toggle;
     }
