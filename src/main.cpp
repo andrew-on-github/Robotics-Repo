@@ -17,7 +17,7 @@
 // LeftBackMotor        motor         2               
 // RightFrontMotor      motor         9               
 // RightBackMotor       motor         10              
-// ---- END VEXCODE CONFIGURED DEVICES ----
+// ---- END VEXCODE CONFIGURED DEViICES ----
 
 #include "vex.h"
 
@@ -28,7 +28,7 @@ using namespace std;
 competition Competition;
 
 // define your global instances of motors and other devices here
-
+//katie was here
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
