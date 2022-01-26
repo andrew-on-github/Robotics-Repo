@@ -264,12 +264,7 @@ void controllerScreen(){
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
         }
-<<<<<<< HEAD:CompetitionCode/src/main.cpp
-
         Controller1.Screen.print(" WARN");
-=======
-        Controller1.Screen.print(" warn");
->>>>>>> a72ac5a (commented out all unstable features. this branch should only contained THOROUGHLY TESTED FUNCTIONAL FEATURES. Everything else to proto branch.):src/main.cpp
       }
       toggle = !toggle;
     }
@@ -299,11 +294,9 @@ void controllerScreen(){
 
 void usercontrol(void) {
 
-<<<<<<< HEAD
-  //thread UIControl(controllerScreen);
-=======
+
   thread UIControl(controllerScreen);
->>>>>>> 326abd7 (cleaned up the code, uncommented all the stuff that shouldn't be commented and removed anything that shouldn't be there at all.)
+
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
@@ -313,12 +306,6 @@ void usercontrol(void) {
   Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
-<<<<<<< HEAD
-=======
-  bool clamp;
-  bool clampLast = false;
->>>>>>> 326abd7 (cleaned up the code, uncommented all the stuff that shouldn't be commented and removed anything that shouldn't be there at all.)
-
   bool clamp = false;
   bool clampLast = false;
 
@@ -382,14 +369,9 @@ void usercontrol(void) {
       LiftMotor.setVelocity(0, percent);
     }
 
-//todo: make this work
-<<<<<<< HEAD
+
     if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
       clamp = !clamp;
-=======
-    if(Controller1.ButtonR2.pressing() != clampLast){
-      clamp = Controller1.ButtonR2.pressing();
->>>>>>> 326abd7 (cleaned up the code, uncommented all the stuff that shouldn't be commented and removed anything that shouldn't be there at all.)
     }
 
     if(Controller1.ButtonY.pressing()){
@@ -412,18 +394,9 @@ void usercontrol(void) {
     LiftMotor.spin(fwd);
     MobileGoalMotor.spin(fwd);
     ClampPiston.set(clamp);
-<<<<<<< HEAD
-    Brain.Screen.print(clamp);
-
 
     clampLast = Controller1.ButtonR2.pressing();
 
-
-=======
-
-
-    clampLast = Controller1.ButtonR2.pressing();
->>>>>>> 326abd7 (cleaned up the code, uncommented all the stuff that shouldn't be commented and removed anything that shouldn't be there at all.)
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
