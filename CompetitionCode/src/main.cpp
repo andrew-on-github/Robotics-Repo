@@ -152,7 +152,8 @@ void autonomous(void) {
   // ..........................................................................
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
-  Controller1.Screen.print("Robot under autonomous control. Please stand clear.");
+  Controller1.Screen.print("AUTO ");
+  Controller1.Screen.print(selectedAuto);
 //still being tested, not ready for competition yet
 while(true){
   switch(selectedAuto){
@@ -197,7 +198,7 @@ while(true){
 /*---------------------------------------------------------------------------*/
 
 //method to control controller screen. currently has temp monitoring, plan to implement timer. should do multithready stuff with it, if you hate yourself, like i do. :)
-/*void controllerScreen(){
+void controllerScreen(){
   double avgTemp;
   double hiTemp;
   
@@ -263,11 +264,8 @@ while(true){
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
         }
-<<<<<<< HEAD
+
         Controller1.Screen.print(" WARN");
-=======
-        Controller1.Screen.print(" warn");
->>>>>>> a72ac5a (commented out all unstable features. this branch should only contained THOROUGHLY TESTED FUNCTIONAL FEATURES. Everything else to proto branch.)
       }
       toggle = !toggle;
     }
@@ -293,7 +291,7 @@ while(true){
     //clearing screen to make room for next values
     Controller1.Screen.clearScreen();
   }
-  }*/
+  }
 
 void usercontrol(void) {
 
