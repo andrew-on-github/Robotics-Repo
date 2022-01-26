@@ -295,17 +295,14 @@ void controllerScreen(){
 
 void usercontrol(void) {
 
-  //thread UIControl(controllerScreen);
-
-  //need to implement, should run at the same time as main with multithreading stuff
-  //task tempWarning = task(tempMonitor);
+  thread UIControl(controllerScreen);
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
 
   //printing roboknights logo
-  //Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
+  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
 
@@ -329,7 +326,6 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
-    //test
     //checking deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
@@ -338,7 +334,6 @@ void usercontrol(void) {
     }
     else{
       //setting motor velocity
-
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
@@ -354,25 +349,25 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
-    // if(Controller1.ButtonR1.pressing()){
-    //   IntakeMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonB.pressing()){
-    //   IntakeMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   IntakeMotor.setVelocity(0, percent);
-    // }
+    if(Controller1.ButtonR1.pressing()){
+      IntakeMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonB.pressing()){
+      IntakeMotor.setVelocity(-100, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
 
-    // if(Controller1.ButtonL1.pressing()){
-    //   LiftMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonL2.pressing()){
-    //   LiftMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   LiftMotor.setVelocity(0, percent);
-    //}
+    if(Controller1.ButtonL1.pressing()){
+      LiftMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      LiftMotor.setVelocity(-100, percent);
+    }
+    else{
+      LiftMotor.setVelocity(0, percent);
+    }
 
 //todo: make this work
     if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
