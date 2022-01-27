@@ -67,6 +67,9 @@ void pre_auton(void) {
       selected = !selected;
     }
 
+
+    //test
+
     //graphic printing
 
     if(selected && selectedAuto != 0){
