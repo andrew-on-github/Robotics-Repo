@@ -148,7 +148,7 @@ void autonomous(void) {
   // ..........................................................................
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
-  Controller1.Screen.print("Robot under autonomous control. Please stand clear.");
+  Controller1.Screen.print("AUTO");
 //still being tested, not ready for competition yet
 while(true){
   switch(selectedAuto){
@@ -192,113 +192,13 @@ while(true){
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-//method to control controller screen. currently has temp monitoring, plan to implement timer. should do multithready stuff with it, if you hate yourself, like i do. :)
-/*void controllerScreen(){
-  double avgTemp;
-  double hiTemp;
-  
-  int totalSecondsRemaining;
-  int minutesRemaining;
-  int secondsRemaining;
-  
-
-  bool toggle = false;
-
-  string highestTempMotor; 
-  
-  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
-  string motorNames[4] = {"Front Left", "Back Left", "Front Right", "Back Right"};
-
-  int hiMotor = 0;
-  int warningTemp = 55; //temperature at which the brain throttles control
-
-  Brain.Timer.reset();
-
-  while(true){
-    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
-    minutesRemaining = ((int) totalSecondsRemaining % 60);
-    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
-
-    //calculating average temp of the 4 motors
-    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
-
-    //calculating highest motor temp
-    for(int i = 0; i<4; i++){
-      if(motors[i].temperature(celsius) >= hiTemp){
-        hiTemp = motors[i].temperature(percent);
-        hiMotor = i;
-      }
-    }
-
-
-
-    //print statements
-    Controller1.Screen.print(minutesRemaining);
-    Controller1.Screen.print(":");
-    Controller1.Screen.print(secondsRemaining);
-    Controller1.Screen.setCursor(1,10);
-    Controller1.Screen.print("Average temp of drivetrain motors: ");
-    Controller1.Screen.print(avgTemp);
-    Controller1.Screen.newLine();
-    Controller1.Screen.print("Highest temp of drivetrain motors: ");
-    Controller1.Screen.print(hiTemp);
-    Controller1.Screen.newLine();
-
-    if(totalSecondsRemaining == 15){
-      Controller1.rumble(rumbleShort);
-    }
-    else if(hiTemp > warningTemp){
-      //rumbling controller if motor temps go above threshold
-      Controller1.rumble(rumblePulse);
-      if(!toggle){
-        
-        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-
-        if (hiMotor == 0) {
-          Controller1.Screen.print("LF");
-        }
-        else if(hiMotor == 1){
-          Controller1.Screen.print("LB");
-        }
-        else if(hiMotor == 2){
-          Controller1.Screen.print("RF");
-        }
-        else if(hiMotor == 3){
-          Controller1.Screen.print("RB");
-        }
-        Controller1.Screen.print(" warn");
-      }
-      toggle = !toggle;
-    }
-
-
-
-    //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
-    //decrease value if you need the ui to update faster, quarter second should be fine
-    wait(250, msec);
-
-    //clearing screen to make room for next values
-    Controller1.Screen.clearScreen();
-  }
-  }*/
-
 void usercontrol(void) {
-
-  //thread UIControl(controllerScreen);
-
-  //need to implement, should run at the same time as main with multithreading stuff
-  //task tempWarning = task(tempMonitor);
-
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
-
-  //printing roboknights logo
-  //Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
-
   //declaring and initializing clamp variables
-  //bool clamp;
-  //bool clampLast = false;
+  bool clamp = false;
+  bool clampLast = false;
 
 
   //default deadzone value 
@@ -342,54 +242,22 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
-    // if(Controller1.ButtonR1.pressing()){
-    //   IntakeMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonB.pressing()){
-    //   IntakeMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   IntakeMotor.setVelocity(0, percent);
-    // }
+    //toggle clamp control variable
+    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+      clamp = !clamp;
+    }
+    
+    //spinning motors and activating hydraulics
 
-    // if(Controller1.ButtonL1.pressing()){
-    //   LiftMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonL2.pressing()){
-    //   LiftMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   LiftMotor.setVelocity(0, percent);
-    //}
+    LeftBackMotor.spin(fwd);
+    LeftFrontMotor.spin(fwd);
+    RightBackMotor.spin(fwd);
+    RightFrontMotor.spin(fwd);
 
-//todo: make this work
-    // if(Controller1.ButtonR2.pressing() != clampLast){
-    //   clamp = Controller1.ButtonR2.pressing();
-    // }
+    ClampPiston.set(clamp);
 
-    // if(Controller1.ButtonY.pressing()){
-    //   MobileGoalMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonDown.pressing()){
-    //   MobileGoalMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   MobileGoalMotor.setVelocity(0, percent);
-    // }
-    // //telling motors to spin
-
-    // LeftBackMotor.spin(fwd);
-    // LeftFrontMotor.spin(fwd);
-    // RightBackMotor.spin(fwd);
-    // RightFrontMotor.spin(fwd);
-
-    // IntakeMotor.spin(fwd);
-    // LiftMotor.spin(fwd);
-    // MobileGoalMotor.spin(fwd);
-    // ClampPiston.set(clamp);
-
-
-    // clampLast = Controller1.ButtonR2.pressing();
+    //update clamplast so inputs arent counted multiple times
+    clampLast = Controller1.ButtonR2.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
