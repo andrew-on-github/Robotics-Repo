@@ -46,6 +46,103 @@ competition Competition;
 /*---------------------------------------------------------------------------*/
 int selectedAuto;
 
+
+void controllerScreen(){
+  double avgTemp;
+  double hiTemp;
+  
+  int totalSecondsRemaining;
+  int minutesRemaining;
+  int secondsRemaining;
+  
+
+  bool toggle = false;
+
+  string highestTempMotor; 
+  
+  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
+
+  int hiMotor = 0;
+  int warningTemp = 55; //temperature at which the brain throttles control
+
+  Brain.Timer.reset();
+
+  
+
+  while(true){
+    //timer calculations
+    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
+    minutesRemaining = ((int) totalSecondsRemaining % 60);
+    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
+
+    //calculating average temp of the 4 motors
+    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
+
+    //calculating highest motor temp
+    for(int i = 0; i<4; i++){
+      if(motors[i].temperature(celsius) >= hiTemp){
+        hiTemp = motors[i].temperature(percent);
+        hiMotor = i;
+      }
+    }
+
+
+
+    //Controller commands
+    //time takes precedence, followed by temp warning, follwoed by everything else
+    Controller1.Screen.setCursor(0, 0);
+
+    if(totalSecondsRemaining == 15){
+      Controller1.rumble(rumbleShort);
+      Controller1.Screen.print("TIME WARN");
+    }
+    else if(hiTemp > warningTemp){
+      //rumbling controller if motor temps go above threshold
+      Controller1.rumble(rumblePulse);
+      if(!toggle){
+        
+        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
+
+        if (hiMotor == 0) {
+          Controller1.Screen.print("LF");
+        }
+        else if(hiMotor == 1){
+          Controller1.Screen.print("LB");
+        }
+        else if(hiMotor == 2){
+          Controller1.Screen.print("RF");
+        }
+        else if(hiMotor == 3){
+          Controller1.Screen.print("RB");
+        }
+        Controller1.Screen.print(" WARN");
+      }
+      toggle = !toggle;
+    }
+    else{
+      Controller1.Screen.print("TIME:");
+      Controller1.Screen.print(minutesRemaining);
+      Controller1.Screen.print(":");
+      Controller1.Screen.print(secondsRemaining);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("AVG/HI:");
+      Controller1.Screen.print(avgTemp);
+      Controller1.Screen.print("/");
+      Controller1.Screen.print(hiTemp);
+      Controller1.Screen.newLine();
+    }
+
+
+
+    //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
+    //decrease value if you need the ui to update faster, quarter second should be fine
+    wait(250, msec);
+
+    //clearing screen to make room for next values
+    Controller1.Screen.clearScreen();
+  }
+}
+
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
@@ -154,6 +251,8 @@ void autonomous(void) {
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
+
+  new thread(controllerScreen);
 
   while(true){
     switch(selectedAuto){
