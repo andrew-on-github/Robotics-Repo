@@ -243,8 +243,8 @@ void usercontrol(void) {
 
     }
     else{
-      RightBackMotor.setVelocity(rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
+      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
     //toggle clamp control variable
