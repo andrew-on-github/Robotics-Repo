@@ -254,15 +254,20 @@ void controllerScreen(){
         
         //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
 
-        if (hiMotor == 0) {
-          Controller1.Screen.print("HO");
-          Controller1.Screen.newLine();
-          Controller1.Screen.print("OO");
+        if (LeftFrontMotor.temperature(percent) > hiTemp) {
+          Controller1.Screen.print("H");
         }
-        else if(hiMotor == 1){
-          Controller1.Screen.print("OO");
-          Controller1.Screen.newLine();
-          Controller1.Screen.print("HO");
+        else{
+          Controller1.Screen.print("O");
+        }
+        if(IntakeMotor.temperature(percent) > hiTemp){
+          Controller1.Screen.print("H");
+        }
+        if(RightFrontMotor.temperature(percent)){
+          Controller1.Screen.print("H");
+        }
+        else{
+          Controller1.Screen.print("O");
         }
         else if(hiMotor == 2){
           Controller1.Screen.print("OH");
