@@ -154,35 +154,35 @@ void autonomous(void) {
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
-//still being tested, not ready for competition yet
-while(true){
-  switch(selectedAuto){
-    case 0:
-      Brain.Screen.print("Running Autonomous 0");
-      LeftBackMotor.spin(fwd);
-      LeftFrontMotor.spin(fwd);
-      RightBackMotor.spin(reverse);
-      RightBackMotor.spin(reverse);
-      break;
-    
-    case 1:
-      Brain.Screen.print("1");
-      break;
 
-    case 2:
-      Brain.Screen.print("2");
-      break;
+  while(true){
+    switch(selectedAuto){
+      case 0:
+        Brain.Screen.print("Running Autonomous 0");
+        LeftBackMotor.spin(fwd);
+        LeftFrontMotor.spin(fwd);
+        RightBackMotor.spin(reverse);
+        RightBackMotor.spin(reverse);
+        break;
+      
+      case 1:
+        Brain.Screen.print("1");
+        break;
 
-    case 3:
-      Brain.Screen.print("3");
-      break;
+      case 2:
+        Brain.Screen.print("2");
+        break;
 
-    default:
-      Brain.Screen.print("error");
-      break;
-  }
-  Brain.Screen.clearScreen();
-  }
+      case 3:
+        Brain.Screen.print("3");
+        break;
+
+      default:
+        Brain.Screen.print("error");
+        break;
+    }
+    Brain.Screen.clearScreen();
+    }
 
 
 }
@@ -280,6 +280,7 @@ int main() {
   pre_auton();
 
   // Prevent main from exiting with an infinite loop.
+  // check for test jumpers, if present run user control or autotest
   while (true) {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
     if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
