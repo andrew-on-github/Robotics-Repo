@@ -241,6 +241,8 @@ void controllerScreen(){
 
     //Controller commands
     //time takes precedence, followed by temp warning, follwoed by everything else
+    Controller1.Screen.setCursor(0, 0);
+
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
       Controller1.Screen.print("TIME WARN");
@@ -253,30 +255,37 @@ void controllerScreen(){
         //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
 
         if (hiMotor == 0) {
-          Controller1.Screen.print("LF");
+          Controller1.Screen.print("HO");
+          Controller1.Screen.newLine();
+          Controller1.Screen.print("OO");
         }
         else if(hiMotor == 1){
-          Controller1.Screen.print("LB");
+          Controller1.Screen.print("OO");
+          Controller1.Screen.newLine();
+          Controller1.Screen.print("HO");
         }
         else if(hiMotor == 2){
-          Controller1.Screen.print("RF");
+          Controller1.Screen.print("OH");
+          Controller1.Screen.newLine();
+          Controller1.Screen.print("OO");
         }
         else if(hiMotor == 3){
-          Controller1.Screen.print("RB");
+          Controller1.Screen.print("OO");
+          Controller1.Screen.newLine();
+          Controller1.Screen.print("OH");
         }
-        Controller1.Screen.print(" WARN");
       }
       toggle = !toggle;
     }
     else{
+      Controller1.Screen.print("TIME:");
       Controller1.Screen.print(minutesRemaining);
       Controller1.Screen.print(":");
       Controller1.Screen.print(secondsRemaining);
-      Controller1.Screen.setCursor(1,10);
-      Controller1.Screen.print("AVG: ");
-      Controller1.Screen.print(avgTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("HI: ");
+      Controller1.Screen.print("AVG/HI:");
+      Controller1.Screen.print(avgTemp);
+      Controller1.Screen.print("/");
       Controller1.Screen.print(hiTemp);
       Controller1.Screen.newLine();
     }
