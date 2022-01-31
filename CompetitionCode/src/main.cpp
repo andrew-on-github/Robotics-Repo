@@ -335,6 +335,16 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
+    if(Controller1.ButtonY.pressing()){
+      MobileGoalMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonDown.pressing()){
+      MobileGoalMotor.setVelocity(-100, percent);
+    }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
+    }
+
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
@@ -357,6 +367,8 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
+
+    MobileGoalMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
