@@ -120,6 +120,7 @@ void controllerScreen(){
       toggle = !toggle;
     }
     else{
+      Controller1.Screen.print(MobileGoalMotor.position(degrees));
       Controller1.Screen.print("TIME:");
       Controller1.Screen.print(minutesRemaining);
       Controller1.Screen.print(":");
@@ -327,16 +328,18 @@ void usercontrol(void) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
+      LeftBackMotor.stop();
+      LeftFrontMotor.stop();
     }
     else{
       //setting motor velocity
 
-      LeftBackMotor.setVelocity(leftMotorSpeed, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
+      LeftBackMotor.setVelocity(leftMotorSpeed * .7, percent);
+      LeftFrontMotor.setVelocity(leftMotorSpeed * .7, percent);
     }
 
     if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(50, percent);
+      MobileGoalMotor.setVelocity(100, percent);
     }
     else if(Controller1.ButtonL2.pressing()){
       MobileGoalMotor.setVelocity(-50, percent);
@@ -349,11 +352,13 @@ void usercontrol(void) {
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
+      RightBackMotor.stop();
+      RightFrontMotor.stop();
 
     }
     else{
-      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
+      RightBackMotor.setVelocity(-rightMotorSpeed * .7, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed * .7, percent);
     }
 
     //toggle clamp control variable
@@ -362,7 +367,6 @@ void usercontrol(void) {
     }
     
     //spinning motors and activating hydraulics
-
     LeftBackMotor.spin(fwd);
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
