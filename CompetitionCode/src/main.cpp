@@ -344,6 +344,16 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
+    if(Controller1.ButtonL1.pressing()){
+      MobileGoalMotor.setVelocity(50, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      MobileGoalMotor.setVelocity(-50, percent);
+    }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
+    }
+
     //toggle clamp control variable
     if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
       clamp = !clamp;
@@ -355,6 +365,8 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
+
+    MobileGoalMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
