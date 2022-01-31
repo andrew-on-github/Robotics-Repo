@@ -336,10 +336,10 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
+      MobileGoalMotor.setVelocity(50, percent);
     }
     else if(Controller1.ButtonL2.pressing()){
-      MobileGoalMotor.setVelocity(-100, percent);
+      MobileGoalMotor.setVelocity(-50, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
@@ -368,7 +368,7 @@ void usercontrol(void) {
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
-    MobileGoalMotor.spin(fwd);
+    MobileGoalMotor.spin(reverse);
 
     ClampPiston.set(clamp);
 
