@@ -13,13 +13,13 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         1               
-// LeftBackMotor        motor         2               
-// RightFrontMotor      motor         9               
-// RightBackMotor       motor         10              
+// LeftFrontMotor       motor         19              
+// LeftBackMotor        motor         9               
+// RightFrontMotor      motor         12              
+// RightBackMotor       motor         2               
 // ClampPiston          digital_out   C               
-// IntakeMotor          motor         11              
-// LiftMotor            motor         12              
+// IntakeMotor          motor         8               
+// LiftMotor            motor         18              
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
@@ -57,8 +57,6 @@ void controllerScreen(){
   
 
   bool toggle = false;
-
-  string highestTempMotor; 
   
   motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
 
