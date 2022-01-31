@@ -335,10 +335,10 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
-    if(Controller1.ButtonY.pressing()){
+    if(Controller1.ButtonL1.pressing()){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(Controller1.ButtonDown.pressing()){
+    else if(Controller1.ButtonL2.pressing()){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
