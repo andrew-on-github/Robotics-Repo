@@ -58,7 +58,7 @@ void controllerScreen(){
 
   bool toggle = false;
   
-  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
+  motor motors[6] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor, IntakeMotor};
 
   int hiMotor = 0;
   int warningTemp = 55; //temperature at which the brain throttles control
@@ -112,6 +112,12 @@ void controllerScreen(){
         }
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
+        }
+        else if(hiMotor == 4){
+          Controller1.Screen.print("MG");
+        }
+        else if(hiMotor == 5){
+          Controller1.Screen.print("IN");
         }
         Controller1.Screen.print(" WARN");
       }
