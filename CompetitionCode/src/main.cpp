@@ -60,7 +60,7 @@ void controllerScreen(){
 
   string highestTempMotor; 
   
-  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
+  motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
 
   int hiMotor = 0;
   int warningTemp = 55; //temperature at which the brain throttles control
@@ -79,7 +79,7 @@ void controllerScreen(){
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
 
     //calculating highest motor temp
-    for(int i = 0; i<4; i++){
+    for(int i = 0; i<5; i++){
       if(motors[i].temperature(celsius) >= hiTemp){
         hiTemp = motors[i].temperature(percent);
         hiMotor = i;
@@ -115,12 +115,14 @@ void controllerScreen(){
         else if(hiMotor == 3){
           Controller1.Screen.print("RB");
         }
+        else if(hiMotor == 4){
+          Controller1.Screen.print("MG");
+        }
         Controller1.Screen.print(" WARN");
       }
       toggle = !toggle;
     }
     else{
-      Controller1.Screen.print(MobileGoalMotor.position(degrees));
       Controller1.Screen.print("TIME:");
       Controller1.Screen.print(minutesRemaining);
       Controller1.Screen.print(":");
