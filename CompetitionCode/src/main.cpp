@@ -50,6 +50,7 @@ int controllerCurve(int input, int curve){
   return (pow(input / 100, curve)) * 100;
 }
 
+
 void controllerScreen(){
   double avgTemp;
   double hiTemp;
@@ -57,7 +58,6 @@ void controllerScreen(){
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
-  
 
   bool toggle = false;
   
@@ -67,8 +67,6 @@ void controllerScreen(){
   int warningTemp = 55; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
-
-  
 
   while(true){
     //timer calculations
@@ -88,9 +86,8 @@ void controllerScreen(){
     }
 
 
-
     //Controller commands
-    //time takes precedence, followed by temp warning, follwoed by everything else
+    //time takes precedence, followed by temp warning, followed by everything else
     Controller1.Screen.setCursor(0, 0);
 
     if(totalSecondsRemaining == 15){
@@ -172,6 +169,8 @@ void pre_auton(void) {
       selected = !selected;
     }
 
+
+    //test
 
     //test
 
@@ -261,6 +260,7 @@ void autonomous(void) {
   new thread(controllerScreen);
 
   while(true){
+
     switch(selectedAuto){
       case 0:
         Brain.Screen.print("Running Autonomous 0");
@@ -336,7 +336,6 @@ void usercontrol(void) {
     }
     else{
       //setting motor velocity
-
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
