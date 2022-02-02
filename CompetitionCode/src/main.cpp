@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       VEX                                                       */
+/*    Author:       Andrew Goad, Katie Caldwell                               */
 /*    Created:      Thu Sep 26 2019                                           */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
@@ -13,13 +13,13 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         1               
-// LeftBackMotor        motor         2               
-// RightFrontMotor      motor         9               
-// RightBackMotor       motor         10              
+// LeftFrontMotor       motor         19              
+// LeftBackMotor        motor         9               
+// RightFrontMotor      motor         12              
+// RightBackMotor       motor         2               
 // ClampPiston          digital_out   C               
-// IntakeMotor          motor         11              
-// LiftMotor            motor         12              
+// IntakeMotor          motor         8               
+// LiftMotor            motor         18              
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
@@ -34,7 +34,7 @@ using namespace std;
 competition Competition;
 
 // define your global instances of motors and other devices here
-
+//katie was here
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -46,6 +46,110 @@ competition Competition;
 /*---------------------------------------------------------------------------*/
 int selectedAuto;
 
+int controllerCurve(int input, int curve){
+  return (pow(input / 100, curve)) * 100;
+}
+
+void controllerScreen(){
+  double avgTemp;
+  double hiTemp;
+  
+  int totalSecondsRemaining;
+  int minutesRemaining;
+  int secondsRemaining;
+  
+
+  bool toggle = false;
+  
+  motor motors[6] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor, IntakeMotor};
+
+  int hiMotor = 0;
+  int warningTemp = 55; //temperature at which the brain throttles control
+
+  Brain.Timer.reset();
+
+  
+
+  while(true){
+    //timer calculations
+    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
+    minutesRemaining = ((int) totalSecondsRemaining % 60);
+    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
+
+    //calculating average temp of the 4 motors
+    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
+
+    //calculating highest motor temp
+    for(int i = 0; i<4; i++){
+      if(motors[i].temperature(celsius) >= hiTemp){
+        hiTemp = motors[i].temperature(percent);
+        hiMotor = i;
+      }
+    }
+
+
+
+    //Controller commands
+    //time takes precedence, followed by temp warning, follwoed by everything else
+    Controller1.Screen.setCursor(0, 0);
+
+    if(totalSecondsRemaining == 15){
+      Controller1.rumble(rumbleShort);
+      Controller1.Screen.print("TIME WARN");
+    }
+    else if(hiTemp > warningTemp){
+      //rumbling controller if motor temps go above threshold
+      Controller1.rumble(rumblePulse);
+      if(!toggle){
+        
+        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
+
+        if (hiMotor == 0) {
+          Controller1.Screen.print("LF");
+        }
+        else if(hiMotor == 1){
+          Controller1.Screen.print("LB");
+        }
+        else if(hiMotor == 2){
+          Controller1.Screen.print("RF");
+        }
+        else if(hiMotor == 3){
+          Controller1.Screen.print("RB");
+        }
+        else if(hiMotor == 4){
+          Controller1.Screen.print("MG");
+        }
+        else if(hiMotor == 5){
+          Controller1.Screen.print("IN");
+        }
+        Controller1.Screen.print(" WARN");
+      }
+      toggle = !toggle;
+    }
+    else{
+      Controller1.Screen.print("TIME:");
+      Controller1.Screen.print(minutesRemaining);
+      Controller1.Screen.print(":");
+      Controller1.Screen.print(secondsRemaining);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("AVG/HI:");
+      Controller1.Screen.print(avgTemp);
+      Controller1.Screen.print("/");
+      Controller1.Screen.print(hiTemp);
+      Controller1.Screen.newLine();
+    }
+
+
+
+    //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
+    //decrease value if you need the ui to update faster, quarter second should be fine
+    wait(250, msec);
+
+    //clearing screen to make room for next values
+    Controller1.Screen.clearScreen();
+  }
+}
+
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
@@ -53,9 +157,8 @@ void pre_auton(void) {
   //declaring and initialzing variables
   selectedAuto = 0;
   bool selected = false;
-
   
-  while(!Competition.isAutonomous() && !Competition.isDriverControl()){
+  while(true){
 
     if(MenuCycle.pressing() && !selected){
       if(selectedAuto > 2){
@@ -68,6 +171,9 @@ void pre_auton(void) {
     if(MenuSelect.pressing()){
       selected = !selected;
     }
+
+
+    //test
 
     //graphic printing
 
@@ -130,8 +236,6 @@ void pre_auton(void) {
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
   }
-  Brain.Screen.clearScreen();
-  Brain.Timer.reset();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -152,37 +256,38 @@ void autonomous(void) {
   // ..........................................................................
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
-  Controller1.Screen.print("AUTO ");
-  Controller1.Screen.print(selectedAuto);
-//still being tested, not ready for competition yet
-while(true){
-  switch(selectedAuto){
-    case 0:
-      Brain.Screen.print("Running Autonomous 0");
-      LeftBackMotor.spin(fwd);
-      LeftFrontMotor.spin(fwd);
-      RightBackMotor.spin(reverse);
-      RightBackMotor.spin(reverse);
-      break;
-    
-    case 1:
-      Brain.Screen.print("1");
-      break;
+  Controller1.Screen.print("AUTO");
 
-    case 2:
-      Brain.Screen.print("2");
-      break;
+  new thread(controllerScreen);
 
-    case 3:
-      Brain.Screen.print("3");
-      break;
+  while(true){
+    switch(selectedAuto){
+      case 0:
+        Brain.Screen.print("Running Autonomous 0");
+        LeftBackMotor.spin(fwd);
+        LeftFrontMotor.spin(fwd);
+        RightBackMotor.spin(reverse);
+        RightBackMotor.spin(reverse);
+        break;
+      
+      case 1:
+        Brain.Screen.print("1");
+        break;
 
-    default:
-      Brain.Screen.print("error");
-      break;
-  }
-  Brain.Screen.clearScreen();
-  }
+      case 2:
+        Brain.Screen.print("2");
+        break;
+
+      case 3:
+        Brain.Screen.print("3");
+        break;
+
+      default:
+        Brain.Screen.print("error");
+        break;
+    }
+    Brain.Screen.clearScreen();
+    }
 
 
 }
@@ -197,131 +302,14 @@ while(true){
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-//method to control controller screen. currently has temp monitoring, plan to implement timer. should do multithready stuff with it, if you hate yourself, like i do. :)
-void controllerScreen(){
-  double avgTemp;
-  double hiTemp;
-  
-  int totalSecondsRemaining;
-  int minutesRemaining;
-  int secondsRemaining;
-  
-
-  bool toggle = false;
-
-  string highestTempMotor; 
-  
-  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
-
-  int hiMotor = 0;
-  int warningTemp = 55; //temperature at which the brain throttles control
-
-  Brain.Timer.reset();
-
-  
-
-  while(true){
-    //timer calculations
-    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
-    minutesRemaining = ((int) totalSecondsRemaining % 60);
-    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
-
-    //calculating average temp of the 4 motors
-    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
-
-    //calculating highest motor temp
-    for(int i = 0; i<4; i++){
-      if(motors[i].temperature(celsius) >= hiTemp){
-        hiTemp = motors[i].temperature(percent);
-        hiMotor = i;
-      }
-    }
-
-
-
-    //Controller commands
-    //time takes precedence, followed by temp warning, follwoed by everything else
-    Controller1.Screen.setCursor(0, 0);
-
-    if(totalSecondsRemaining == 15){
-      Controller1.rumble(rumbleShort);
-      Controller1.Screen.print("TIME WARN");
-    }
-    else if(hiTemp > warningTemp){
-      //rumbling controller if motor temps go above threshold
-      Controller1.rumble(rumblePulse);
-      if(!toggle){
-        
-        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-
-        if (LeftFrontMotor.temperature(percent) > hiTemp) {
-          Controller1.Screen.print("H");
-        }
-        else{
-          Controller1.Screen.print("O");
-        }
-        if(IntakeMotor.temperature(percent) > hiTemp){
-          Controller1.Screen.print("H");
-        }
-        if(RightFrontMotor.temperature(percent)){
-          Controller1.Screen.print("H");
-        }
-        else{
-          Controller1.Screen.print("O");
-        }
-        else if(hiMotor == 2){
-          Controller1.Screen.print("OH");
-          Controller1.Screen.newLine();
-          Controller1.Screen.print("OO");
-        }
-        else if(hiMotor == 3){
-          Controller1.Screen.print("OO");
-          Controller1.Screen.newLine();
-          Controller1.Screen.print("OH");
-        }
-      }
-      toggle = !toggle;
-    }
-    else{
-      Controller1.Screen.print("TIME:");
-      Controller1.Screen.print(minutesRemaining);
-      Controller1.Screen.print(":");
-      Controller1.Screen.print(secondsRemaining);
-      Controller1.Screen.newLine();
-      Controller1.Screen.print("AVG/HI:");
-      Controller1.Screen.print(avgTemp);
-      Controller1.Screen.print("/");
-      Controller1.Screen.print(hiTemp);
-      Controller1.Screen.newLine();
-    }
-
-
-
-    //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
-    //decrease value if you need the ui to update faster, quarter second should be fine
-    wait(250, msec);
-
-    //clearing screen to make room for next values
-    Controller1.Screen.clearScreen();
-  }
-  }
-
 void usercontrol(void) {
-
-
-  thread UIControl(controllerScreen);
-
-
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
-
-
-  //printing roboknights logo
-  Brain.Screen.drawImageFromFile("RoboKnights logo 2019.png", 10, 10);
 
   //declaring and initializing clamp variables
   bool clamp = false;
   bool clampLast = false;
+
 
   //default deadzone value 
   //want this to be as low as possible without any drift
@@ -334,12 +322,12 @@ void usercontrol(void) {
 
   // User control code here, inside the loop 
   while (true) {
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(0,0);
-    //initializing motorspeed variables
-    leftMotorSpeed = Controller1.Axis3.position(percent);
-    rightMotorSpeed = Controller1.Axis2.position(percent);
 
+    //initializing motorspeed variables
+    leftMotorSpeed = controllerCurve(Controller1.Axis3.position(percent), 3);
+    rightMotorSpeed = controllerCurve(Controller1.Axis2.position(percent), 3);
+
+    //test
     //checking deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
@@ -348,6 +336,7 @@ void usercontrol(void) {
     }
     else{
       //setting motor velocity
+
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
@@ -359,58 +348,38 @@ void usercontrol(void) {
 
     }
     else{
-      RightBackMotor.setVelocity(rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
-    }
-
-    if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonB.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
+      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
     if(Controller1.ButtonL1.pressing()){
-      LiftMotor.setVelocity(100, percent);
+      MobileGoalMotor.setVelocity(50, percent);
     }
     else if(Controller1.ButtonL2.pressing()){
-      LiftMotor.setVelocity(-100, percent);
-    }
-    else{
-      LiftMotor.setVelocity(0, percent);
-    }
-
-
-    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
-      clamp = !clamp;
-    }
-
-    if(Controller1.ButtonY.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonDown.pressing()){
-      MobileGoalMotor.setVelocity(-100, percent);
+      MobileGoalMotor.setVelocity(-50, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
     }
-    //telling motors to spin
+
+    //toggle clamp control variable
+    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+      clamp = !clamp;
+    }
+    
+    //spinning motors and activating hydraulics
 
     LeftBackMotor.spin(fwd);
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
-    IntakeMotor.spin(fwd);
-    LiftMotor.spin(fwd);
     MobileGoalMotor.spin(fwd);
+
     ClampPiston.set(clamp);
 
+    //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
-
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
@@ -427,32 +396,32 @@ int main() {
   // Run the pre-autonomous function.
   pre_auton();
 
-  //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
-  if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
-    while(1){
-      while(!Controller1.ButtonR2.pressing()){
-        if(Controller1.ButtonA.pressing()){
-          selectedAuto = 0;
-        }
-        else if(Controller1.ButtonB.pressing()){
-          selectedAuto = 1;
-        }
-        else if(Controller1.ButtonX.pressing()){
-          selectedAuto = 2;
-        }
-        else if(Controller1.ButtonY.pressing()){
-          selectedAuto = 3;
-        }
-    }
-   }
-    autonomous();
-  }
-  else if(TestJump && !Competition.isCompetitionSwitch()){
-    usercontrol();
-  }
-
   // Prevent main from exiting with an infinite loop.
+  // check for test jumpers, if present run user control or autotest
   while (true) {
+      //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
+    if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
+      while(1){
+        while(!Controller1.ButtonR2.pressing()){
+          if(Controller1.ButtonA.pressing()){
+            selectedAuto = 0;
+          }
+          else if(Controller1.ButtonB.pressing()){
+            selectedAuto = 1;
+          }
+          else if(Controller1.ButtonX.pressing()){
+            selectedAuto = 2;
+          }
+          else if(Controller1.ButtonY.pressing()){
+            selectedAuto = 3;
+          }
+      }
+    }
+      autonomous();
+    }
+    else if(TestJump && !Competition.isCompetitionSwitch()){
+      usercontrol();
+    }
     wait(100, msec);
   }
 }
