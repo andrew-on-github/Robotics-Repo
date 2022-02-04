@@ -18,8 +18,8 @@
 // RightFrontMotor      motor         12              
 // RightBackMotor       motor         2               
 // ClampPiston          digital_out   C               
-// IntakeMotor          motor         8               
-// LiftMotor            motor         18              
+// IntakeMotor          motor         18              
+// LiftMotor            motor         3               
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
@@ -350,6 +350,16 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
+    if(Controller1.ButtonY.pressing()){
+      IntakeMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonR1.pressing()){
+      IntakeMotor.setVelocity(-100, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
     if(Controller1.ButtonL1.pressing()){
       MobileGoalMotor.setVelocity(50, percent);
     }
@@ -373,6 +383,8 @@ void usercontrol(void) {
     RightFrontMotor.spin(fwd);
 
     MobileGoalMotor.spin(fwd);
+
+    IntakeMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
