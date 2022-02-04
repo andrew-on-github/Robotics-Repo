@@ -46,10 +46,21 @@ competition Competition;
 /*---------------------------------------------------------------------------*/
 int selectedAuto;
 
-int controllerCurve(int input, int curve){
-  return (pow(input / 100, curve)) * 100;
-}
+int controllerCurve(int input, double curve){
+  double dubInput = input;
 
+  dubInput /= 100;
+
+  pow(dubInput, curve);
+
+  dubInput *= 100;
+
+  if(input <= 0){
+    return -dubInput;
+  }
+
+  return dubInput;
+}
 
 void controllerScreen(){
   double avgTemp;
@@ -324,8 +335,8 @@ void usercontrol(void) {
   while (true) {
 
     //initializing motorspeed variables
-    leftMotorSpeed = controllerCurve(Controller1.Axis3.position(percent), 3);
-    rightMotorSpeed = controllerCurve(Controller1.Axis2.position(percent), 3);
+    leftMotorSpeed = controllerCurve(Controller1.Axis3.position(percent), 2);
+    rightMotorSpeed = controllerCurve(Controller1.Axis2.position(percent), 2);
 
     //test
     //checking deadzone
