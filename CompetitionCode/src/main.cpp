@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Andrew Goad, Katie Caldwell, JD Francois                  */
+/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim      */
 /*    Created:      Thu Sep 26 2019                                           */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
