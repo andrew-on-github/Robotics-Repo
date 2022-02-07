@@ -17,12 +17,13 @@
 // LeftBackMotor        motor         9               
 // RightFrontMotor      motor         12              
 // RightBackMotor       motor         2               
-// ClampPiston          digital_out   C               
+// ClampPiston          digital_out   F               
 // IntakeMotor          motor         18              
 // LiftMotor            motor         3               
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
+// MobileGoalSwitch     limit         C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -361,10 +362,10 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(50, percent);
+      MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(Controller1.ButtonL2.pressing()){
-      MobileGoalMotor.setVelocity(-50, percent);
+    else if(Controller1.ButtonL2.pressing() && !MobileGoalSwitch.pressing()){
+      MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
