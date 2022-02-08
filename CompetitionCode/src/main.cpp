@@ -53,21 +53,18 @@ bool preauto = true;
 
 void controllerScreen(){
   double avgTemp;
-  double hiTemp;
+  double hiTemp = 0;
   
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
-  
-
-  bool toggle = false;
 
   string highestTempMotor; 
   
   motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
 
   int hiMotor = 0;
-  int warningTemp = 55; //temperature at which the brain throttles control
+  int warningTemp = 100; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
 
@@ -96,6 +93,7 @@ void controllerScreen(){
     //time takes precedence, followed by temp warning, follwoed by everything else
     Controller1.Screen.setCursor(0, 0);
 
+    totalSecondsRemaining = 100;
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
       Controller1.Screen.print("TIME WARN");
@@ -103,28 +101,25 @@ void controllerScreen(){
     else if(hiTemp > warningTemp){
       //rumbling controller if motor temps go above threshold
       Controller1.rumble(rumblePulse);
-      if(!toggle){
-        
-        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-
-        if (hiMotor == 0) {
-          Controller1.Screen.print("LF");
-        }
-        else if(hiMotor == 1){
-          Controller1.Screen.print("LB");
-        }
-        else if(hiMotor == 2){
-          Controller1.Screen.print("RF");
-        }
-        else if(hiMotor == 3){
-          Controller1.Screen.print("RB");
-        }
-        else if(hiMotor == 4){
-          Controller1.Screen.print("MG");
-        }
-        Controller1.Screen.print(" WARN");
+      //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
+      if (hiMotor == 0) {
+        Controller1.Screen.print("LF");
       }
-      toggle = !toggle;
+      else if(hiMotor == 1){
+        Controller1.Screen.print("LB");
+      }
+      else if(hiMotor == 2){
+        Controller1.Screen.print("RF");
+      }
+      else if(hiMotor == 3){
+        Controller1.Screen.print("RB");
+      }
+      else if(hiMotor == 4){
+        Controller1.Screen.print("MG");
+      }
+      Controller1.Screen.print(" WARN");
+      Controller1.Screen.newLine();
+      Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
       Controller1.Screen.print("TIME:");
@@ -262,8 +257,6 @@ void autonomous(void) {
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  new thread(controllerScreen);
-
   while(true){
     switch(selectedAuto){
       case 0:
@@ -307,6 +300,8 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+
+  new thread(controllerScreen);
 
   //updating flag to cause preauton method to exit
   preauto = false;
@@ -374,7 +369,6 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(-rightMotorSpeed * .7, percent);
     }
 
-    //toggle clamp control variable
     if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
       clamp = !clamp;
     }
