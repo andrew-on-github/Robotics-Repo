@@ -320,8 +320,8 @@ void usercontrol(void) {
   int deadzone = 3;
 
   //declaring motor speed vars
-  int leftMotorSpeed;
-  int rightMotorSpeed;
+  int leftMotorSpeed = 0;
+  int rightMotorSpeed = 0;
 
   // User control code here, inside the loop 
   while (true) {
@@ -347,10 +347,10 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
+      MobileGoalMotor.setVelocity(-50, percent);
     }
     else if(Controller1.ButtonL2.pressing()){
-      MobileGoalMotor.setVelocity(-50, percent);
+      MobileGoalMotor.setVelocity(100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
