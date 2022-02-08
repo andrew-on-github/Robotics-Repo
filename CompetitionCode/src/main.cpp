@@ -1,10 +1,7 @@
-//julian
-
-
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Andrew Goad, Katie Caldwell                               */
+/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim      */
 /*    Created:      Thu Sep 26 2019                                           */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
@@ -16,13 +13,13 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         19              
-// LeftBackMotor        motor         9               
-// RightFrontMotor      motor         12              
-// RightBackMotor       motor         2               
+// LeftFrontMotor       motor         1               
+// LeftBackMotor        motor         2               
+// RightFrontMotor      motor         9               
+// RightBackMotor       motor         10              
 // ClampPiston          digital_out   F               
-// IntakeMotor          motor         18              
-// LiftMotor            motor         3               
+// IntakeMotor          motor         11              
+// LiftMotor            motor         12              
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
@@ -51,6 +48,10 @@ competition Competition;
 int selectedAuto;
 
 
+//declaring and initializing preauto flag
+bool preauto = true;
+
+
 void controllerScreen(){
   double avgTemp;
   double hiTemp;
@@ -61,8 +62,10 @@ void controllerScreen(){
   
 
   bool toggle = false;
+
+  string highestTempMotor; 
   
-  motor motors[6] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor, IntakeMotor};
+  motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
 
   int hiMotor = 0;
   int warningTemp = 55; //temperature at which the brain throttles control
@@ -72,10 +75,6 @@ void controllerScreen(){
   
 
   while(true){
-
-    Brain.Screen.setCursor(0,0);
-    Brain.Screen.print(MobileGoalMotor.position(degrees));
-
     //timer calculations
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
     minutesRemaining = ((int) totalSecondsRemaining % 60);
@@ -85,7 +84,7 @@ void controllerScreen(){
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
 
     //calculating highest motor temp
-    for(int i = 0; i<4; i++){
+    for(int i = 0; i<5; i++){
       if(motors[i].temperature(percent) >= hiTemp){
         hiTemp = motors[i].temperature(percent);
         hiMotor = i;
@@ -124,10 +123,11 @@ void controllerScreen(){
         else if(hiMotor == 4){
           Controller1.Screen.print("MG");
         }
-        else if(hiMotor == 5){
-          Controller1.Screen.print("IN");
-        }
         Controller1.Screen.print(" WARN");
+
+        Controller1.Screen.newLine();
+
+        Controller1.Screen.print(motors[hiMotor].temperature(percent));
       }
       toggle = !toggle;
     }
@@ -158,13 +158,13 @@ void controllerScreen(){
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  competition::bStopAllTasksBetweenModes = true;
 
   //declaring and initialzing variables
   selectedAuto = 0;
   bool selected = false;
 
-  while(!Competition.isEnabled()){
+  
+  while(preauto){
 
     if(MenuCycle.pressing() && !selected){
       if(selectedAuto > 2){
@@ -260,11 +260,14 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  
+  //updating flag to cause preauton method to exit
+  preauto = false;
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  
+  new thread(controllerScreen);
 
   while(true){
     switch(selectedAuto){
@@ -309,8 +312,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  
-  new thread(controllerScreen);
+
+  //updating flag to cause preauton method to exit
+  preauto = false;
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
@@ -331,7 +335,7 @@ void usercontrol(void) {
 
   // User control code here, inside the loop 
   while (true) {
-    
+
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
@@ -346,39 +350,28 @@ void usercontrol(void) {
     else{
       //setting motor velocity
 
-      LeftBackMotor.setVelocity(leftMotorSpeed, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
+      LeftBackMotor.setVelocity(leftMotorSpeed * .7, percent);
+      LeftFrontMotor.setVelocity(leftMotorSpeed * .7, percent);
+    }
+
+    if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
+      MobileGoalMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      MobileGoalMotor.setVelocity(-100, percent);
+    }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
     }
 
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
-
     }
     else{
-      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
-    }
-
-    if(Controller1.ButtonY.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
-    }
-
-    if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonL2.pressing() && !MobileGoalSwitch.pressing()){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else{
-      MobileGoalMotor.setVelocity(0, percent);
+      RightBackMotor.setVelocity(-rightMotorSpeed * .7, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed * .7, percent);
     }
 
     //toggle clamp control variable
@@ -387,15 +380,12 @@ void usercontrol(void) {
     }
     
     //spinning motors and activating hydraulics
-
     LeftBackMotor.spin(fwd);
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
-    MobileGoalMotor.spin(fwd);
-
-    IntakeMotor.spin(fwd);
+    MobileGoalMotor.spin(reverse);
 
     ClampPiston.set(clamp);
 
