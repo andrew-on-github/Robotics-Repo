@@ -1,3 +1,6 @@
+//julian
+
+
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -69,6 +72,10 @@ void controllerScreen(){
   
 
   while(true){
+
+    Brain.Screen.setCursor(0,0);
+    Brain.Screen.print(MobileGoalMotor.position(degrees));
+
     //timer calculations
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
     minutesRemaining = ((int) totalSecondsRemaining % 60);
@@ -151,13 +158,13 @@ void controllerScreen(){
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+  competition::bStopAllTasksBetweenModes = true;
 
   //declaring and initialzing variables
   selectedAuto = 0;
   bool selected = false;
 
-  
-  while(true){
+  while(!Competition.isEnabled()){
 
     if(MenuCycle.pressing() && !selected){
       if(selectedAuto > 2){
@@ -257,7 +264,7 @@ void autonomous(void) {
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  new thread(controllerScreen);
+  
 
   while(true){
     switch(selectedAuto){
@@ -302,6 +309,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  
+  new thread(controllerScreen);
+
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
@@ -321,7 +331,7 @@ void usercontrol(void) {
 
   // User control code here, inside the loop 
   while (true) {
-
+    
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
