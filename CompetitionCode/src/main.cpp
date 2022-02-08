@@ -325,8 +325,6 @@ void usercontrol(void) {
 
 
   //default deadzone value 
-  //want this to be as low as possible without any drift
-  //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
   int deadzone = 3;
 
   //declaring motor speed vars
@@ -396,6 +394,8 @@ void usercontrol(void) {
     RightFrontMotor.spin(fwd);
 
     MobileGoalMotor.spin(reverse);
+
+    IntakeMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
