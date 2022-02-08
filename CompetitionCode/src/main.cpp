@@ -13,13 +13,13 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         1               
-// LeftBackMotor        motor         2               
-// RightFrontMotor      motor         9               
-// RightBackMotor       motor         10              
+// LeftFrontMotor       motor         19              
+// LeftBackMotor        motor         9               
+// RightFrontMotor      motor         12              
+// RightBackMotor       motor         3               
 // ClampPiston          digital_out   F               
-// IntakeMotor          motor         11              
-// LiftMotor            motor         12              
+// IntakeMotor          motor         18              
+// LiftMotor            motor         4               
 // MobileGoalMotor      motor         13              
 // TestJump             digital_in    D               
 // AutoTest             digital_in    E               
@@ -330,8 +330,8 @@ void usercontrol(void) {
   int deadzone = 3;
 
   //declaring motor speed vars
-  int leftMotorSpeed;
-  int rightMotorSpeed;
+  int leftMotorSpeed = 0;
+  int rightMotorSpeed = 0;
 
   // User control code here, inside the loop 
   while (true) {
@@ -350,8 +350,8 @@ void usercontrol(void) {
     else{
       //setting motor velocity
 
-      LeftBackMotor.setVelocity(leftMotorSpeed * .7, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed * .7, percent);
+      LeftBackMotor.setVelocity(leftMotorSpeed, percent);
+      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
     if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
@@ -370,8 +370,8 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(0, percent);
     }
     else{
-      RightBackMotor.setVelocity(-rightMotorSpeed * .7, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed * .7, percent);
+      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
     //toggle clamp control variable
