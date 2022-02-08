@@ -330,8 +330,8 @@ void usercontrol(void) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
-      LeftBackMotor.stop();
-      LeftFrontMotor.stop();
+      LeftBackMotor.stop(hold);
+      LeftFrontMotor.stop(hold);
     }
     else{
       //setting motor velocity
@@ -354,8 +354,8 @@ void usercontrol(void) {
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
-      RightBackMotor.stop();
-      RightFrontMotor.stop();
+      RightBackMotor.stop(hold);
+      RightFrontMotor.stop(hold);
 
     }
     else{
