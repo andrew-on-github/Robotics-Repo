@@ -80,7 +80,7 @@ void controllerScreen(){
 
     //calculating highest motor temp
     for(int i = 0; i<5; i++){
-      if(motors[i].temperature(celsius) >= hiTemp){
+      if(motors[i].temperature(percent) >= hiTemp){
         hiTemp = motors[i].temperature(percent);
         hiMotor = i;
       }
