@@ -47,6 +47,10 @@ competition Competition;
 int selectedAuto;
 
 
+//declaring and initializing preauto flag
+bool preauto = true;
+
+
 void controllerScreen(){
   double avgTemp;
   double hiTemp;
@@ -155,7 +159,7 @@ void pre_auton(void) {
   bool selected = false;
 
   
-  while(true){
+  while(preauto){
 
     if(MenuCycle.pressing() && !selected){
       if(selectedAuto > 2){
@@ -251,6 +255,9 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  
+  //updating flag to cause preauton method to exit
+  preauto = false;
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
@@ -300,6 +307,10 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+
+  //updating flag to cause preauton method to exit
+  preauto = false;
+
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
