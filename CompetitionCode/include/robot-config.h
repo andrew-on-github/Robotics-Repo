@@ -14,7 +14,6 @@ extern digital_out ClampPiston;
 extern motor IntakeMotor;
 extern motor LiftMotor;
 extern motor MobileGoalMotor;
-extern digital_in TestJump;
 extern digital_in AutoTest;
 extern limit MobileGoalSwitch;
 
