@@ -51,6 +51,22 @@ int selectedAuto = 0;
 //declaring and initializing preauto flag
 bool preauto = true;
 
+int controllerCurve(int input, double curve){
+  
+  double dubInput = input;
+
+  dubInput /= 100;
+
+  dubInput = pow(dubInput, curve);
+
+  dubInput *= 100;
+
+  if(input >= 0){
+    return (int)dubInput;
+  }
+  return (int)(fabs(dubInput) * -1);
+
+}
 
 void controllerScreen(){
 
@@ -124,8 +140,9 @@ void controllerScreen(){
       Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
-      Controller1.Screen.print("TIME: %d:%d\n", minutesRemaining, secondsRemaining);
-      Controller1.Screen.print("AVG/HI: %d:%d\n", avgTemp, hiTemp);
+      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
     }
 
 
