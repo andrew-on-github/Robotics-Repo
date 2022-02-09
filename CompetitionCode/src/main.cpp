@@ -34,8 +34,6 @@ using namespace std;
 // A global instance of competition
 competition Competition;
 
-// define your global instances of motors and other devices here
-//katie was here
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -53,8 +51,8 @@ bool preauto = true;
 
 
 void controllerScreen(){
-  double avgTemp;
-  double hiTemp;
+  double avgTemp = 0;
+  double hiTemp = 0;
   
   int totalSecondsRemaining;
   int minutesRemaining;
@@ -104,32 +102,27 @@ void controllerScreen(){
     else if(hiTemp > warningTemp){
       //rumbling controller if motor temps go above threshold
       Controller1.rumble(rumblePulse);
-      if(!toggle){
-        
         //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-
-        if (hiMotor == 0) {
-          Controller1.Screen.print("LF");
-        }
-        else if(hiMotor == 1){
-          Controller1.Screen.print("LB");
-        }
-        else if(hiMotor == 2){
-          Controller1.Screen.print("RF");
-        }
-        else if(hiMotor == 3){
-          Controller1.Screen.print("RB");
-        }
-        else if(hiMotor == 4){
-          Controller1.Screen.print("MG");
-        }
-        Controller1.Screen.print(" WARN");
-
-        Controller1.Screen.newLine();
-
-        Controller1.Screen.print(motors[hiMotor].temperature(percent));
+      if (hiMotor == 0) {
+        Controller1.Screen.print("LF");
       }
-      toggle = !toggle;
+      else if(hiMotor == 1){
+        Controller1.Screen.print("LB");
+      }
+      else if(hiMotor == 2){
+        Controller1.Screen.print("RF");
+      }
+      else if(hiMotor == 3){
+        Controller1.Screen.print("RB");
+      }
+      else if(hiMotor == 4){
+        Controller1.Screen.print("MG");
+      }
+      Controller1.Screen.print(" WARN");
+
+      Controller1.Screen.newLine();
+
+      Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
       Controller1.Screen.print("TIME:");
@@ -148,7 +141,7 @@ void controllerScreen(){
 
     //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
     //decrease value if you need the ui to update faster, quarter second should be fine
-    wait(250, msec);
+    wait(1, sec);
 
     //clearing screen to make room for next values
     Controller1.Screen.clearScreen();
@@ -178,11 +171,7 @@ void pre_auton(void) {
       selected = !selected;
     }
 
-
-    //test
-
     //graphic printing
-
     if(selected && selectedAuto != 0){
       Brain.Screen.setPenColor(white);
       Brain.Screen.drawRectangle(0, 0, 120, 120);
@@ -236,14 +225,11 @@ void pre_auton(void) {
     }
     //all hail king boolean
 
-    //wait statement
     wait(300, msec);
 
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
   }
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
 }
 
 /*---------------------------------------------------------------------------*/
@@ -272,11 +258,7 @@ void autonomous(void) {
   while(true){
     switch(selectedAuto){
       case 0:
-        Brain.Screen.print("Running Autonomous 0");
-        LeftBackMotor.spin(fwd);
-        LeftFrontMotor.spin(fwd);
-        RightBackMotor.spin(reverse);
-        RightBackMotor.spin(reverse);
+        Brain.Screen.print("0");
         break;
       
       case 1:
@@ -338,7 +320,6 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
-    //test
     //checking deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
@@ -347,7 +328,6 @@ void usercontrol(void) {
     }
     else{
       //setting motor velocity
-
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
@@ -383,7 +363,7 @@ void usercontrol(void) {
     }
 
     //toggle clamp control variable
-    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+    if(Controller1.ButtonR2.pressing() && !clampLast){
       clamp = !clamp;
     }
     
@@ -393,7 +373,7 @@ void usercontrol(void) {
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
-    MobileGoalMotor.spin(reverse);
+    MobileGoalMotor.spin(fwd);
 
     IntakeMotor.spin(fwd);
 
