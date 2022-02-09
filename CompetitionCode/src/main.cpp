@@ -51,7 +51,7 @@ int controllerCurve(int input, double curve){
 
   dubInput /= 100;
 
-  pow(dubInput, curve);
+  dubInput = pow(dubInput, curve);
 
   dubInput *= 100;
 
