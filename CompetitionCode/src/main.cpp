@@ -21,7 +21,6 @@
 // IntakeMotor          motor         11              
 // LiftMotor            motor         12              
 // MobileGoalMotor      motor         13              
-// TestJump             digital_in    D               
 // AutoTest             digital_in    E               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -44,6 +43,8 @@ competition Competition;
 /*  function is only called once after the V5 has been powered on and        */
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
+
+//global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
 
@@ -52,9 +53,12 @@ bool preauto = true;
 
 
 void controllerScreen(){
+
+  //declaring and initializing variables for temp control
   double avgTemp = 0;
   double hiTemp = 0;
   
+  //delcaring and variables for timer
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
@@ -68,7 +72,11 @@ void controllerScreen(){
 
   while(true){
     //timer calculations
+
+    //subtracting seconds since brain timer reset from 105 (user control time in secoinds)
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
+
+    //splitting into minutes and seconds remaining for display
     minutesRemaining = (totalSecondsRemaining / 60);
     secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
 
@@ -85,7 +93,7 @@ void controllerScreen(){
 
 
 
-    //Controller commands
+    //controller screen print commands
     //time takes precedence, followed by temp warning, follwoed by everything else
     Controller1.Screen.setCursor(0, 0);
 
@@ -135,14 +143,18 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  //declaring and initialzing variables
+  //initializing selected auto to 0
   selectedAuto = 0;
+
+  //true when autonomous is "locked in" false when still selecting
   bool selected = false;
 
-  
+  //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
 
+    //if menucycle is pressed and auton is not locked in
     if(MenuCycle.pressing() && !selected){
+      //increment auton, rollover to 0
       if(selectedAuto > 2){
         selectedAuto = 0;
       }
@@ -155,7 +167,6 @@ void pre_auton(void) {
     }
 
     //graphic printing
-
     if(selected && selectedAuto != 0){
       Brain.Screen.setPenColor(white);
       Brain.Screen.drawRectangle(0, 0, 120, 120);
@@ -307,8 +318,7 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
-    //test
-    //checking deadzone
+    //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
@@ -323,6 +333,24 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
+    //same as above
+    if(abs(rightMotorSpeed) < deadzone) {
+      RightBackMotor.setVelocity(0, percent);
+      RightFrontMotor.setVelocity(0, percent);
+      RightBackMotor.stop(hold);
+      RightFrontMotor.stop(hold);
+    }
+    else{
+      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
+    }
+
+    //Clamp: R2 toggles
+    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+      clamp = !clamp;
+    }
+
+    //MobileGoalMotor: L1: in, Y: out
     if(Controller1.ButtonL1.pressing()){
       MobileGoalMotor.setVelocity(-50, percent);
     }
@@ -331,23 +359,6 @@ void usercontrol(void) {
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
-    }
-
-    //same as above
-    if(abs(rightMotorSpeed) < deadzone) {
-      RightBackMotor.setVelocity(0, percent);
-      RightFrontMotor.setVelocity(0, percent);
-      RightBackMotor.stop(hold);
-      RightFrontMotor.stop(hold);
-
-    }
-    else{
-      RightBackMotor.setVelocity(-rightMotorSpeed * .7, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed * .7, percent);
-    }
-
-    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
-      clamp = !clamp;
     }
     
     //spinning motors and activating hydraulics
@@ -382,8 +393,10 @@ int main() {
   // check for test jumpers, if present run user control or autotest
   while (true) {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
-    if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
+    if(AutoTest && !Competition.isCompetitionSwitch()){
       while(1){
+        //use letter buttons to select autonomous, run with r2
+        //afterwards, select again
         while(!Controller1.ButtonR2.pressing()){
           if(Controller1.ButtonA.pressing()){
             selectedAuto = 0;
@@ -400,9 +413,6 @@ int main() {
       }
     }
       autonomous();
-    }
-    else if(TestJump && !Competition.isCompetitionSwitch()){
-      usercontrol();
     }
     wait(100, msec);
   }
