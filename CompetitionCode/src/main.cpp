@@ -21,7 +21,6 @@
 // IntakeMotor          motor         18              
 // LiftMotor            motor         4               
 // MobileGoalMotor      motor         13              
-// TestJump             digital_in    D               
 // AutoTest             digital_in    E               
 // MobileGoalSwitch     limit         C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -401,7 +400,7 @@ int main() {
   // check for test jumpers, if present run user control or autotest
   while (true) {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
-    if(TestJump && AutoTest && !Competition.isCompetitionSwitch()){
+    if(AutoTest && !Competition.isCompetitionSwitch()){
       while(1){
         while(!Controller1.ButtonR2.pressing()){
           if(Controller1.ButtonA.pressing()){
@@ -419,9 +418,6 @@ int main() {
       }
     }
       autonomous();
-    }
-    else if(TestJump && !Competition.isCompetitionSwitch()){
-      usercontrol();
     }
     wait(100, msec);
   }
