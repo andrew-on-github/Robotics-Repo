@@ -44,7 +44,7 @@ competition Competition;
 /*  function is only called once after the V5 has been powered on and        */
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
-int selectedAuto;
+int selectedAuto = 0;
 
 
 //declaring and initializing preauto flag
@@ -52,14 +52,12 @@ bool preauto = true;
 
 
 void controllerScreen(){
-  double avgTemp;
+  double avgTemp = 0;
   double hiTemp = 0;
   
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
-
-  string highestTempMotor; 
   
   motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
 
@@ -68,13 +66,11 @@ void controllerScreen(){
 
   Brain.Timer.reset();
 
-  
-
   while(true){
     //timer calculations
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
-    minutesRemaining = ((int) totalSecondsRemaining % 60);
-    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
+    minutesRemaining = (totalSecondsRemaining / 60);
+    secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
 
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
@@ -93,7 +89,6 @@ void controllerScreen(){
     //time takes precedence, followed by temp warning, follwoed by everything else
     Controller1.Screen.setCursor(0, 0);
 
-    totalSecondsRemaining = 100;
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
       Controller1.Screen.print("TIME WARN");
@@ -117,28 +112,19 @@ void controllerScreen(){
       else if(hiMotor == 4){
         Controller1.Screen.print("MG");
       }
-      Controller1.Screen.print(" WARN");
-      Controller1.Screen.newLine();
+      Controller1.Screen.print(" WARN\n");
       Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
-      Controller1.Screen.print("TIME:");
-      Controller1.Screen.print(minutesRemaining);
-      Controller1.Screen.print(":");
-      Controller1.Screen.print(secondsRemaining);
-      Controller1.Screen.newLine();
-      Controller1.Screen.print("AVG/HI:");
-      Controller1.Screen.print(avgTemp);
-      Controller1.Screen.print("/");
-      Controller1.Screen.print(hiTemp);
-      Controller1.Screen.newLine();
+      Controller1.Screen.print("TIME: %d:%d\n", minutesRemaining, secondsRemaining);
+      Controller1.Screen.print("AVG/HI: %d:%d\n", avgTemp, hiTemp);
     }
 
 
 
     //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
     //decrease value if you need the ui to update faster, quarter second should be fine
-    wait(250, msec);
+    wait(1, sec);
 
     //clearing screen to make room for next values
     Controller1.Screen.clearScreen();
@@ -167,9 +153,6 @@ void pre_auton(void) {
     if(MenuSelect.pressing()){
       selected = !selected;
     }
-
-
-    //test
 
     //graphic printing
 
@@ -260,11 +243,7 @@ void autonomous(void) {
   while(true){
     switch(selectedAuto){
       case 0:
-        Brain.Screen.print("Running Autonomous 0");
-        LeftBackMotor.spin(fwd);
-        LeftFrontMotor.spin(fwd);
-        RightBackMotor.spin(reverse);
-        RightBackMotor.spin(reverse);
+        Brain.Screen.print("0");
         break;
       
       case 1:
@@ -284,9 +263,7 @@ void autonomous(void) {
         break;
     }
     Brain.Screen.clearScreen();
-    }
-
-
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -336,14 +313,14 @@ void usercontrol(void) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
+      //sets motors to brake mode
       LeftBackMotor.stop(hold);
       LeftFrontMotor.stop(hold);
     }
     else{
       //setting motor velocity
-
-      LeftBackMotor.setVelocity(leftMotorSpeed * .7, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed * .7, percent);
+      LeftBackMotor.setVelocity(leftMotorSpeed, percent);
+      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
     if(Controller1.ButtonL1.pressing()){
@@ -379,7 +356,7 @@ void usercontrol(void) {
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
 
-    MobileGoalMotor.spin(reverse);
+    MobileGoalMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
