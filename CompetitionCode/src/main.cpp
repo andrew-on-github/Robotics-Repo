@@ -140,7 +140,14 @@ void controllerScreen(){
       Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
-      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
+      //make sure that the correct number of digits is printed for seconds
+      if(secondsRemaining < 10){
+        Controller1.Screen.print("TIME: %d:0%d", minutesRemaining, secondsRemaining);
+      }
+      else{
+        Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
+      }
+      //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
     }
