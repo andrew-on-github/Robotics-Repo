@@ -64,7 +64,7 @@ int controllerCurve(int input, double curve){
   if(input >= 0){
     return (int)dubInput;
   }
-  return (int)(fabs(dubInput) * -1);
+  return -((int)(fabs(dubInput)));
 
 }
 
