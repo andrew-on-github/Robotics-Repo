@@ -1,3 +1,4 @@
+//git main
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -380,12 +381,13 @@ void usercontrol(void) {
       clamp = !clamp;
     }
 
-    //MobileGoalMotor: L1: in, Y: out
-    if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(-50, percent);
-    }
-    else if(Controller1.ButtonL2.pressing()){
+    if(Controller1.ButtonL1.pressing() && -MobileGoalMotor.position(degrees) > 100){
+    //MobileGoalMotor: L2: in, L1: out
       MobileGoalMotor.setVelocity(100, percent);
+    }
+    
+    else if(Controller1.ButtonL2.pressing() && -MobileGoalMotor.position(degrees) < 625){
+      MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
