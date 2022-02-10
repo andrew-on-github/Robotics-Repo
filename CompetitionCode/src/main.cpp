@@ -93,8 +93,14 @@ void controllerScreen(){
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
 
     //splitting into minutes and seconds remaining for display
-    minutesRemaining = (totalSecondsRemaining / 60);
-    secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    if(totalSecondsRemaining > 0){
+      minutesRemaining = (totalSecondsRemaining / 60);
+      secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    }
+    else{
+      minutesRemaining = 0;
+      secondsRemaining = 0;
+    }
 
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
