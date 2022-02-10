@@ -42,40 +42,59 @@ competition Competition;
 /*  function is only called once after the V5 has been powered on and        */
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
-int selectedAuto;
+
+//global variable changed in preauton function in order to control which auton is run
+int selectedAuto = 0;
 
 
 //declaring and initializing preauto flag
 bool preauto = true;
 
+int controllerCurve(int input, double curve){
+  
+  double dubInput = input;
+
+  dubInput /= 100;
+
+  dubInput = pow(dubInput, curve);
+
+  dubInput *= 100;
+
+  if(input >= 0){
+    return (int)dubInput;
+  }
+  return (int)(fabs(dubInput) * -1);
+
+}
+
 
 void controllerScreen(){
+
+  //declaring and initializing variables for temp control
   double avgTemp = 0;
   double hiTemp = 0;
   
+  //delcaring and variables for timer
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
   
-
-  bool toggle = false;
-
-  string highestTempMotor; 
-  
   motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
 
   int hiMotor = 0;
-  int warningTemp = 55; //temperature at which the brain throttles control
+  int warningTemp = 100; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
 
-  
-
   while(true){
     //timer calculations
+
+    //subtracting seconds since brain timer reset from 105 (user control time in secoinds)
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
-    minutesRemaining = ((int) totalSecondsRemaining % 60);
-    secondsRemaining = (int) totalSecondsRemaining - (minutesRemaining * 60);
+
+    //splitting into minutes and seconds remaining for display
+    minutesRemaining = (totalSecondsRemaining / 60);
+    secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
 
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
@@ -90,7 +109,7 @@ void controllerScreen(){
 
 
 
-    //Controller commands
+    //controller screen print commands
     //time takes precedence, followed by temp warning, follwoed by everything else
     Controller1.Screen.setCursor(0, 0);
 
@@ -118,22 +137,13 @@ void controllerScreen(){
         Controller1.Screen.print("MG");
       }
       Controller1.Screen.print(" WARN");
-
       Controller1.Screen.newLine();
-
       Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
-      Controller1.Screen.print("TIME:");
-      Controller1.Screen.print(minutesRemaining);
-      Controller1.Screen.print(":");
-      Controller1.Screen.print(secondsRemaining);
+      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("AVG/HI:");
-      Controller1.Screen.print(avgTemp);
-      Controller1.Screen.print("/");
-      Controller1.Screen.print(hiTemp);
-      Controller1.Screen.newLine();
+      Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
     }
 
 
@@ -151,14 +161,18 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  //declaring and initialzing variables
+  //initializing selected auto to 0
   selectedAuto = 0;
+
+  //true when autonomous is "locked in" false when still selecting
   bool selected = false;
 
-  
+  //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
 
+    //if menucycle is pressed and auton is not locked in
     if(MenuCycle.pressing() && !selected){
+      //increment auton, rollover to 0
       if(selectedAuto > 2){
         selectedAuto = 0;
       }
@@ -252,8 +266,6 @@ void autonomous(void) {
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  new thread(controllerScreen);
-
   while(true){
     switch(selectedAuto){
       case 0:
@@ -277,9 +289,7 @@ void autonomous(void) {
         break;
     }
     Brain.Screen.clearScreen();
-    }
-
-
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -293,6 +303,7 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  new thread(controllerScreen);
 
   //updating flag to cause preauton method to exit
   preauto = false;
@@ -319,11 +330,14 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
-    //checking deadzone
+    //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
+      //sets motors to brake mode
+      LeftBackMotor.stop(hold);
+      LeftFrontMotor.stop(hold);
     }
     else{
       //setting motor velocity
@@ -357,13 +371,24 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(0, percent);
     }
     else{
-      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
+      RightBackMotor.setVelocity(rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
-    //toggle clamp control variable
+    //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !clampLast){
       clamp = !clamp;
+    }
+
+    //MobileGoalMotor: L1: in, Y: out
+    if(Controller1.ButtonL1.pressing()){
+      MobileGoalMotor.setVelocity(-50, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      MobileGoalMotor.setVelocity(100, percent);
+    }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
     }
     
     //spinning motors and activating hydraulics
@@ -402,6 +427,8 @@ int main() {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
     if(AutoTest && !Competition.isCompetitionSwitch()){
       while(1){
+        //use letter buttons to select autonomous, run with r2
+        //afterwards, select again
         while(!Controller1.ButtonR2.pressing()){
           if(Controller1.ButtonA.pressing()){
             selectedAuto = 0;
@@ -422,4 +449,3 @@ int main() {
     wait(100, msec);
   }
 }
-
