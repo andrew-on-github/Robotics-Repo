@@ -358,8 +358,8 @@ void usercontrol(void) {
       RightFrontMotor.stop(hold);
     }
     else{
-      RightBackMotor.setVelocity(-rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(-rightMotorSpeed, percent);
+      RightBackMotor.setVelocity(rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
     //Clamp: R2 toggles
