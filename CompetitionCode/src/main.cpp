@@ -89,7 +89,7 @@ void controllerScreen(){
   while(true){
     //timer calculations
 
-    //subtracting seconds since brain timer reset from 105 (user control time in secoinds)
+    //subtracting seconds since brain timer reset from 105 (user control time in seconds)
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
 
     //splitting into minutes and seconds remaining for display
