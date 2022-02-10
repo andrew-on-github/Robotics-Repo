@@ -363,7 +363,7 @@ void usercontrol(void) {
     }
 
     //Clamp: R2 toggles
-    if((Controller1.ButtonR2.pressing() != clampLast) && Controller1.ButtonR2.pressing()){
+    if(Controller1.ButtonR2.pressing() && !clampLast){
       clamp = !clamp;
     }
 
