@@ -415,6 +415,7 @@ void usercontrol(void) {
 
     ClampPiston.set(clamp);
 
+    MobileGoalMotor.spin(fwd);
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
 
