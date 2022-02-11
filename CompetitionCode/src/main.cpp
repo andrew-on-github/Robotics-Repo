@@ -280,6 +280,48 @@ void autonomous(void) {
     switch(selectedAuto){
       case 0:
         Brain.Screen.print("0");
+        MobileGoalMotor.setVelocity(100,percent);
+        MobileGoalMotor.spin(fwd);
+        wait(2,msec);
+        LeftBackMotor.setVelocity(100,percent);
+        LeftFrontMotor.setVelocity(100,percent);
+        RightBackMotor.setVelocity(100, percent);
+        RightFrontMotor.setVelocity(100,percent);
+        LeftBackMotor.spin(fwd);
+      LeftFrontMotor.spin(fwd);
+      RightBackMotor.spin(fwd);
+      RightFrontMotor.spin(fwd);
+      wait(3,msec);
+      LeftBackMotor.setVelocity(-100,percent);
+      LeftFrontMotor.setVelocity(100,percent);
+      RightBackMotor.setVelocity(100,percent);
+      RightFrontMotor.setVelocity(-100,percent);
+      LeftBackMotor.spinFor(reverse,2, msec);
+      LeftFrontMotor.spinFor(fwd,2,msec);
+      RightBackMotor.spinFor(fwd,2, msec);
+      RightFrontMotor.spinFor(reverse,2,msec);
+      wait(.5,msec);
+      LeftBackMotor.setVelocity(100,percent);
+        LeftFrontMotor.setVelocity(100,percent);
+        RightBackMotor.setVelocity(100, percent);
+        RightFrontMotor.setVelocity(100,percent);
+        IntakeMotor.setVelocity(100,percent);
+        LeftBackMotor.spin(fwd);
+      LeftFrontMotor.spin(fwd);
+      RightBackMotor.spin(fwd);
+      RightFrontMotor.spin(fwd);
+      IntakeMotor.spin(fwd);
+      wait(5, msec);
+      LeftBackMotor.setVelocity(100,percent);
+        LeftFrontMotor.setVelocity(-100,percent);
+        RightBackMotor.setVelocity(-100, percent);
+        RightFrontMotor.setVelocity(-100,percent);
+        MobileGoalMotor.setVelocity(100,percent);
+        LeftBackMotor.spin(reverse);
+      LeftFrontMotor.spin(reverse);
+      RightBackMotor.spin(reverse);
+      RightFrontMotor.spin(reverse);
+      MobileGoalMotor.spin(fwd);
         break;
       
       case 1:
