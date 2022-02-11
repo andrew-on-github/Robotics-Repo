@@ -332,6 +332,9 @@ void usercontrol(void) {
   bool clamp = false;
   bool clampLast = false;
 
+  //delcaring and initializing mobilegoal macro vars
+  bool l1Last = false;
+  bool mobileGoalFwd = false;
 
   //default deadzone value 
   //want this to be as low as possible without any drift
@@ -381,11 +384,22 @@ void usercontrol(void) {
       clamp = !clamp;
     }
 
+    //Mobile Goal: L1 toggles
+    if(Controller1.ButtonL1.pressing() && !l1Last){
+      mobileGoalFwd = !mobileGoalFwd;
+    }
+
+    if(MobileGoalMotor.position(degrees) > 100 && ){
+
+    }
+    else if(MobileGoalMotor.position(degrees) < 625){
+      MobileGoalMotor.setVelocity(-100, percent);
+    }
+
     if(Controller1.ButtonL1.pressing() && -MobileGoalMotor.position(degrees) > 100){
     //MobileGoalMotor: L2: in, L1: out
       MobileGoalMotor.setVelocity(100, percent);
     }
-    
     else if(Controller1.ButtonL2.pressing() && -MobileGoalMotor.position(degrees) < 625){
       MobileGoalMotor.setVelocity(-100, percent);
     }
@@ -398,8 +412,6 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
-
-    MobileGoalMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
