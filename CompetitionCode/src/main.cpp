@@ -412,14 +412,16 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
+    
+    MobileGoalMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
-    MobileGoalMotor.spin(fwd);
+    
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
 
-    //update l1Last
+    //update l1Last so inputs arent counted mulitple times
     l1Last = Controller1.ButtonL1.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
