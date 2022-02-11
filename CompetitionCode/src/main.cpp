@@ -403,7 +403,7 @@ void usercontrol(void) {
     if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalMotor.position(degrees) > -550 && mobileGoalFwd){
+    else if(MobileGoalMotor.position(degrees) > -500 && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
