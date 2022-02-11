@@ -390,18 +390,10 @@ void usercontrol(void) {
     }
 
     if(MobileGoalMotor.position(degrees) > 100 && !mobileGoalFwd){
-      MobileGoalMotor.setVelocity(100, percent);
+      MobileGoalMotor.setVelocity(-100, percent);
     }
     else if(MobileGoalMotor.position(degrees) < 625 && mobileGoalFwd){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-
-    if(Controller1.ButtonL1.pressing() && -MobileGoalMotor.position(degrees) > 100){
-    //MobileGoalMotor: L2: in, L1: out
       MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonL2.pressing() && -MobileGoalMotor.position(degrees) < 625){
-      MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
