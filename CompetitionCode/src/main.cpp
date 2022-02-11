@@ -152,6 +152,8 @@ void controllerScreen(){
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("MG ANGLE %.2f", MobileGoalMotor.position(degrees));
     }
 
 
@@ -323,6 +325,11 @@ void usercontrol(void) {
   bool clamp = false;
   bool clampLast = false;
 
+  //declaring and initializing mobile goal variables
+  bool l1Last = false;
+
+  //mobile goal control var
+  bool mobileGoalFwd = false;
 
   //default deadzone value 
   int deadzone = 3;
@@ -363,15 +370,15 @@ void usercontrol(void) {
       IntakeMotor.setVelocity(0, percent);
     }
 
-    if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
-      MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonL2.pressing()){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else{
-      MobileGoalMotor.setVelocity(0, percent);
-    }
+    // if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
+    //   MobileGoalMotor.setVelocity(100, percent);
+    // }
+    // else if(Controller1.ButtonL2.pressing()){
+    //   MobileGoalMotor.setVelocity(-100, percent);
+    // }
+    // else{
+    //   MobileGoalMotor.setVelocity(0, percent);
+    // }
 
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
@@ -388,12 +395,16 @@ void usercontrol(void) {
       clamp = !clamp;
     }
 
-    //MobileGoalMotor: L1: in, Y: out
-    if(Controller1.ButtonL1.pressing()){
-      MobileGoalMotor.setVelocity(-50, percent);
+    if(Controller1.ButtonL1.pressing() && !l1Last){
+      mobileGoalFwd = !mobileGoalFwd;
     }
-    else if(Controller1.ButtonL2.pressing()){
+
+    //MobileGoalMotor: L1 toggles
+    if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
+    }
+    else if(MobileGoalMotor.position(degrees) > -550 && mobileGoalFwd){
+      MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
@@ -413,6 +424,7 @@ void usercontrol(void) {
 
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
+    l1Last = Controller1.ButtonL1.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
