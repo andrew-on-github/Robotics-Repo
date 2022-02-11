@@ -158,7 +158,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print(MobileGoalMotor.position(degrees));
+      Controller1.Screen.print("MG ANGLE: %.2f", -MobileGoalMotor.position(degrees));
     }
 
 
