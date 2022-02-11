@@ -389,10 +389,10 @@ void usercontrol(void) {
       mobileGoalFwd = !mobileGoalFwd;
     }
 
-    if(MobileGoalMotor.position(degrees) > 100 && ){
-
+    if(MobileGoalMotor.position(degrees) > 100 && !mobileGoalFwd){
+      MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalMotor.position(degrees) < 625){
+    else if(MobileGoalMotor.position(degrees) < 625 && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
 
@@ -417,6 +417,9 @@ void usercontrol(void) {
 
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
+
+    //update l1Last
+    l1Last = Controller1.ButtonL1.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
