@@ -157,6 +157,8 @@ void controllerScreen(){
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
+      Controller1.Screen.newLine();
+      Controller1.Screen.print(MobileGoalMotor.position(degrees));
     }
 
 
@@ -389,11 +391,11 @@ void usercontrol(void) {
       mobileGoalFwd = !mobileGoalFwd;
     }
 
-    if(MobileGoalMotor.position(degrees) > 100 && !mobileGoalFwd){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else if(MobileGoalMotor.position(degrees) < 625 && mobileGoalFwd){
+    if(MobileGoalMotor.position(degrees) < -150 && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
+    }
+    else if(MobileGoalMotor.position(degrees) > -550 && mobileGoalFwd){
+      MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent);
