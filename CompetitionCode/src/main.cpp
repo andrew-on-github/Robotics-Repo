@@ -255,6 +255,25 @@ void pre_auton(void) {
   }
 }
 
+void setVelocityAllMotors(double val) {
+  LeftFrontMotor.setVelocity(val, percent);
+  LeftBackMotor.setVelocity(val, percent);
+  RightFrontMotor.setVelocity(val, percent);
+  RightBackMotor.setVelocity(val, percent);
+}
+void setDirectionAllMotors(directionType dir) {
+  LeftFrontMotor.spin(dir);
+  RightFrontMotor.spin(dir);
+  LeftBackMotor.spin(dir);
+  RightBackMotor.spin(dir);
+}
+void stopAllMotors() {
+  LeftFrontMotor.stop(coast);
+  LeftBackMotor.stop(coast);
+  RightFrontMotor.stop(coast);
+  RightBackMotor.stop(coast);
+}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -270,78 +289,110 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   
+  printf("autonomous starting.\n");
+
   //updating flag to cause preauton method to exit
   preauto = false;
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  while(true){
     switch(selectedAuto){
       case 0:
         Brain.Screen.print("0");
-        MobileGoalMotor.setVelocity(100,percent);
+        Controller1.Screen.print("AUTO 0");
+
+        // turn off hold
+        stopAllMotors();
+        wait(100, msec); // .1 s
+
+        // lower lift
+        MobileGoalMotor.setVelocity(-100,percent);
         MobileGoalMotor.spin(fwd);
-        wait(2,msec);
-        LeftBackMotor.setVelocity(100,percent);
-        LeftFrontMotor.setVelocity(100,percent);
-        RightBackMotor.setVelocity(100, percent);
-        RightFrontMotor.setVelocity(100,percent);
-        LeftBackMotor.spin(fwd);
-      LeftFrontMotor.spin(fwd);
-      RightBackMotor.spin(fwd);
-      RightFrontMotor.spin(fwd);
-      wait(3,msec);
-      LeftBackMotor.setVelocity(-100,percent);
-      LeftFrontMotor.setVelocity(100,percent);
-      RightBackMotor.setVelocity(100,percent);
-      RightFrontMotor.setVelocity(-100,percent);
-      LeftBackMotor.spinFor(reverse,2, msec);
-      LeftFrontMotor.spinFor(fwd,2,msec);
-      RightBackMotor.spinFor(fwd,2, msec);
-      RightFrontMotor.spinFor(reverse,2,msec);
-      wait(.5,msec);
-      LeftBackMotor.setVelocity(100,percent);
-        LeftFrontMotor.setVelocity(100,percent);
-        RightBackMotor.setVelocity(100, percent);
-        RightFrontMotor.setVelocity(100,percent);
+        wait(500, msec); // .6 s
+        MobileGoalMotor.stop();
+        wait(250, msec); // .85 s
+
+        // drive forward to first goalpost
+        setVelocityAllMotors(50);
+        setDirectionAllMotors(reverse);
+        wait(600, msec); // 1.45 s
+        setVelocityAllMotors(0);
+        stopAllMotors();
+        wait(100, msec); // 1.55 s
+
+        // lift goalpost
+        MobileGoalMotor.setVelocity(-100,percent);
+        MobileGoalMotor.spin(reverse);
+        wait(1200,msec); // 2.75 s
+        MobileGoalMotor.stop();
+        wait(100,msec); // 2.85 s
+
+
+        /*setVelocityAllMotors(100);
+        LeftFrontMotor.spinFor(reverse, 1000, msec);
+        LeftBackMotor.spinFor(reverse,1000, msec);
+        RightFrontMotor.spinFor(fwd,1000, msec);
+        RightBackMotor.spinFor(fwd,1000,msec);
+        setVelocityAllMotors(100);
+        setDirectionAllMotors(fwd);
+        wait(100,msec);
+        setVelocityAllMotors(0);
+        stopAllMotors(); */
+
+
+        // run intake
         IntakeMotor.setVelocity(100,percent);
-        LeftBackMotor.spin(fwd);
-      LeftFrontMotor.spin(fwd);
-      RightBackMotor.spin(fwd);
-      RightFrontMotor.spin(fwd);
-      IntakeMotor.spin(fwd);
-      wait(5, msec);
-      LeftBackMotor.setVelocity(100,percent);
-        LeftFrontMotor.setVelocity(-100,percent);
-        RightBackMotor.setVelocity(-100, percent);
-        RightFrontMotor.setVelocity(-100,percent);
-        MobileGoalMotor.setVelocity(100,percent);
-        LeftBackMotor.spin(reverse);
-      LeftFrontMotor.spin(reverse);
-      RightBackMotor.spin(reverse);
-      RightFrontMotor.spin(reverse);
-      MobileGoalMotor.spin(fwd);
+        IntakeMotor.spin(fwd);
+        wait(4000,msec); // 5.85 s
+        IntakeMotor.stop();
+
+        // spin 180
+        setVelocityAllMotors(80);
+        LeftFrontMotor.spinFor(reverse, 1600, msec);
+        LeftBackMotor.spinFor(reverse,1600, msec);
+        RightFrontMotor.spinFor(fwd,1600, msec);
+        RightBackMotor.spinFor(fwd,1600,msec);
+        stopAllMotors();
+        wait(100, msec);
+
+        // put goalpost down
+        MobileGoalMotor.setVelocity(-70,percent);
+        MobileGoalMotor.spin(fwd);
+        wait(500, msec);
+        MobileGoalMotor.stop();
+        wait(100, msec);
+
+        // back up
+        setVelocityAllMotors(-80);
+        setDirectionAllMotors(reverse);
+        wait(1000,msec);
+        stopAllMotors();
+
+        
         break;
       
       case 1:
         Brain.Screen.print("1");
+        Controller1.Screen.print("AUTO 1");
         break;
 
       case 2:
         Brain.Screen.print("2");
+        Controller1.Screen.print("AUTO 2");
         break;
 
       case 3:
         Brain.Screen.print("3");
+        Controller1.Screen.print("AUTO 3");
         break;
 
       default:
         Brain.Screen.print("error");
+        Controller1.Screen.print("error");
         break;
     }
-    Brain.Screen.clearScreen();
-  }
+    //Brain.Screen.clearScreen();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -393,8 +444,8 @@ void usercontrol(void) {
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
       //sets motors to brake mode
-      LeftBackMotor.stop(hold);
-      LeftFrontMotor.stop(hold);
+      LeftBackMotor.stop();
+      LeftFrontMotor.stop();
     }
     else{
       //setting motor velocity
@@ -449,7 +500,7 @@ void usercontrol(void) {
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
-      MobileGoalMotor.setVelocity(0, percent);
+      MobileGoalMotor.setVelocity(0, percent); 
     }
     
     //spinning motors and activating hydraulics
@@ -485,7 +536,7 @@ int main() {
 
   // Prevent main from exiting with an infinite loop.
   // check for test jumpers, if present run user control or autotest
-  while (true) {
+  /*while (true) {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
     if(AutoTest && !Competition.isCompetitionSwitch()){
       while(1){
@@ -509,5 +560,5 @@ int main() {
       autonomous();
     }
     wait(100, msec);
-  }
+  }*/
 }
