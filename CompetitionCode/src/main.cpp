@@ -100,6 +100,10 @@ void controllerScreen(){
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
 
+    //resetting hiTemp var so we get accurate info-if this var is not reset it will
+    //display the highest historical value and not the highest current
+    hiTemp = 0;
+
     //calculating highest motor temp
     for(int i = 0; i<5; i++){
       if(motors[i].temperature(percent) >= hiTemp){
