@@ -153,7 +153,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("MG ANGLE %.2f", MobileGoalMotor.position(degrees));
+      Controller1.Screen.print("MG ANGLE %.2f", MobileGoalPot.angle(degrees));
     }
 
 
@@ -493,10 +493,10 @@ void usercontrol(void) {
     }
 
     //MobileGoalMotor: L1 toggles
-    if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
+    if(MobileGoalPot.angle(degrees) > 105 && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalMotor.position(degrees) > -500 && mobileGoalFwd){
+    else if(MobileGoalPot.angle(degrees) < 150  && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
