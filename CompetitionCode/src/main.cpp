@@ -14,16 +14,15 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         19              
-// LeftBackMotor        motor         9               
-// RightFrontMotor      motor         12              
-// RightBackMotor       motor         3               
-// ClampPiston          digital_out   F               
-// IntakeMotor          motor         18              
-// LiftMotor            motor         4               
+// LeftFrontMotor       motor         1               
+// LeftBackMotor        motor         2               
+// RightFrontMotor      motor         9               
+// RightBackMotor       motor         10              
+// ClampPiston          digital_out   C               
+// IntakeMotor          motor         11              
+// LiftMotor            motor         12              
 // MobileGoalMotor      motor         13              
 // AutoTest             digital_in    E               
-// MobileGoalSwitch     limit         C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -34,6 +33,8 @@ using namespace std;
 // A global instance of competition
 competition Competition;
 
+// define your global instances of motors and other devices here
+//katie was here
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -68,7 +69,6 @@ int controllerCurve(int input, double curve){
 
 }
 
-
 void controllerScreen(){
 
   //declaring and initializing variables for temp control
@@ -94,8 +94,14 @@ void controllerScreen(){
     totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
 
     //splitting into minutes and seconds remaining for display
-    minutesRemaining = (totalSecondsRemaining / 60);
-    secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    if(totalSecondsRemaining > 0){
+      minutesRemaining = (totalSecondsRemaining / 60);
+      secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    }
+    else{
+      minutesRemaining = 0;
+      secondsRemaining = 0;
+    }
 
     //calculating average temp of the 4 motors
     avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
@@ -121,7 +127,7 @@ void controllerScreen(){
     else if(hiTemp > warningTemp){
       //rumbling controller if motor temps go above threshold
       Controller1.rumble(rumblePulse);
-        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
+      //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
       if (hiMotor == 0) {
         Controller1.Screen.print("LF");
       }
@@ -137,8 +143,7 @@ void controllerScreen(){
       else if(hiMotor == 4){
         Controller1.Screen.print("MG");
       }
-      Controller1.Screen.print(" WARN");
-      Controller1.Screen.newLine();
+      Controller1.Screen.print(" WARN\n");
       Controller1.Screen.print(motors[hiMotor].temperature(percent));
     }
     else{
@@ -153,7 +158,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("MG ANGLE %.2f", MobileGoalMotor.position(degrees));
+      Controller1.Screen.print("MG ANGLE: %.2f", -MobileGoalMotor.position(degrees));
     }
 
 
@@ -248,30 +253,14 @@ void pre_auton(void) {
     }
     //all hail king boolean
 
+    //wait statement
     wait(300, msec);
 
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
   }
-}
-
-void setVelocityAllMotors(double val) {
-  LeftFrontMotor.setVelocity(val, percent);
-  LeftBackMotor.setVelocity(val, percent);
-  RightFrontMotor.setVelocity(val, percent);
-  RightBackMotor.setVelocity(val, percent);
-}
-void setDirectionAllMotors(directionType dir) {
-  LeftFrontMotor.spin(dir);
-  RightFrontMotor.spin(dir);
-  LeftBackMotor.spin(dir);
-  RightBackMotor.spin(dir);
-}
-void stopAllMotors() {
-  LeftFrontMotor.stop(coast);
-  LeftBackMotor.stop(coast);
-  RightFrontMotor.stop(coast);
-  RightBackMotor.stop(coast);
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
 }
 
 /*---------------------------------------------------------------------------*/
@@ -289,110 +278,36 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   
-  printf("autonomous starting.\n");
-
   //updating flag to cause preauton method to exit
   preauto = false;
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
+  while(true){
     switch(selectedAuto){
       case 0:
         Brain.Screen.print("0");
-        Controller1.Screen.print("AUTO 0");
-
-        // turn off hold
-        stopAllMotors();
-        wait(100, msec); // .1 s
-
-        // lower lift
-        MobileGoalMotor.setVelocity(-100,percent);
-        MobileGoalMotor.spin(fwd);
-        wait(500, msec); // .6 s
-        MobileGoalMotor.stop();
-        wait(250, msec); // .85 s
-
-        // drive forward to first goalpost
-        setVelocityAllMotors(50);
-        setDirectionAllMotors(reverse);
-        wait(600, msec); // 1.45 s
-        setVelocityAllMotors(0);
-        stopAllMotors();
-        wait(100, msec); // 1.55 s
-
-        // lift goalpost
-        MobileGoalMotor.setVelocity(-100,percent);
-        MobileGoalMotor.spin(reverse);
-        wait(1200,msec); // 2.75 s
-        MobileGoalMotor.stop();
-        wait(100,msec); // 2.85 s
-
-
-        /*setVelocityAllMotors(100);
-        LeftFrontMotor.spinFor(reverse, 1000, msec);
-        LeftBackMotor.spinFor(reverse,1000, msec);
-        RightFrontMotor.spinFor(fwd,1000, msec);
-        RightBackMotor.spinFor(fwd,1000,msec);
-        setVelocityAllMotors(100);
-        setDirectionAllMotors(fwd);
-        wait(100,msec);
-        setVelocityAllMotors(0);
-        stopAllMotors(); */
-
-
-        // run intake
-        IntakeMotor.setVelocity(100,percent);
-        IntakeMotor.spin(fwd);
-        wait(4000,msec); // 5.85 s
-        IntakeMotor.stop();
-
-        // spin 180
-        setVelocityAllMotors(80);
-        LeftFrontMotor.spinFor(reverse, 1600, msec);
-        LeftBackMotor.spinFor(reverse,1600, msec);
-        RightFrontMotor.spinFor(fwd,1600, msec);
-        RightBackMotor.spinFor(fwd,1600,msec);
-        stopAllMotors();
-        wait(100, msec);
-
-        // put goalpost down
-        MobileGoalMotor.setVelocity(-70,percent);
-        MobileGoalMotor.spin(fwd);
-        wait(500, msec);
-        MobileGoalMotor.stop();
-        wait(100, msec);
-
-        // back up
-        setVelocityAllMotors(-80);
-        setDirectionAllMotors(reverse);
-        wait(1000,msec);
-        stopAllMotors();
-
-        
         break;
       
       case 1:
         Brain.Screen.print("1");
-        Controller1.Screen.print("AUTO 1");
         break;
 
       case 2:
         Brain.Screen.print("2");
-        Controller1.Screen.print("AUTO 2");
         break;
 
       case 3:
         Brain.Screen.print("3");
-        Controller1.Screen.print("AUTO 3");
         break;
 
       default:
         Brain.Screen.print("error");
-        Controller1.Screen.print("error");
         break;
     }
-    //Brain.Screen.clearScreen();
+    Brain.Screen.clearScreen();
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -406,6 +321,7 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+
   new thread(controllerScreen);
 
   //updating flag to cause preauton method to exit
@@ -418,13 +334,13 @@ void usercontrol(void) {
   bool clamp = false;
   bool clampLast = false;
 
-  //declaring and initializing mobile goal variables
+  //delcaring and initializing mobilegoal macro vars
   bool l1Last = false;
-
-  //mobile goal control var
   bool mobileGoalFwd = false;
 
   //default deadzone value 
+  //want this to be as low as possible without any drift
+  //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
   int deadzone = 3;
 
   //declaring motor speed vars
@@ -444,8 +360,8 @@ void usercontrol(void) {
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
       //sets motors to brake mode
-      LeftBackMotor.stop();
-      LeftFrontMotor.stop();
+      LeftBackMotor.stop(hold);
+      LeftFrontMotor.stop(hold);
     }
     else{
       //setting motor velocity
@@ -453,30 +369,12 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
-    if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonY.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
-    }
-
-    // if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
-    //   MobileGoalMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonL2.pressing()){
-    //   MobileGoalMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   MobileGoalMotor.setVelocity(0, percent);
-    // }
-
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
+      RightBackMotor.stop(hold);
+      RightFrontMotor.stop(hold);
     }
     else{
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
@@ -488,19 +386,19 @@ void usercontrol(void) {
       clamp = !clamp;
     }
 
+    //Mobile Goal: L1 toggles
     if(Controller1.ButtonL1.pressing() && !l1Last){
       mobileGoalFwd = !mobileGoalFwd;
     }
 
-    //MobileGoalMotor: L1 toggles
-    if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
+    if(MobileGoalMotor.position(degrees) < -150 && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalMotor.position(degrees) > -500 && mobileGoalFwd){
+    else if(MobileGoalMotor.position(degrees) > -550 && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
-      MobileGoalMotor.setVelocity(0, percent); 
+      MobileGoalMotor.setVelocity(0, percent);
     }
     
     //spinning motors and activating hydraulics
@@ -508,15 +406,16 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
-
+    
     MobileGoalMotor.spin(fwd);
-
-    IntakeMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
+    
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
+
+    //update l1Last so inputs arent counted mulitple times
     l1Last = Controller1.ButtonL1.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -536,7 +435,7 @@ int main() {
 
   // Prevent main from exiting with an infinite loop.
   // check for test jumpers, if present run user control or autotest
-  /*while (true) {
+  while (true) {
       //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
     if(AutoTest && !Competition.isCompetitionSwitch()){
       while(1){
@@ -560,5 +459,6 @@ int main() {
       autonomous();
     }
     wait(100, msec);
-  }*/
+  }
 }
+
