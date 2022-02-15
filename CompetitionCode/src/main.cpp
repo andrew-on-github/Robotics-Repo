@@ -355,7 +355,7 @@ void usercontrol(void) {
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
-    //if the difference between the sticks is within 5
+    //if the difference between the sticks is within 10
     if(abs(leftMotorSpeed) - abs(rightMotorSpeed) <= 10){
       //set the motor outputs to the avg of the two
       avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
