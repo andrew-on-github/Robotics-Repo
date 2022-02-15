@@ -309,12 +309,12 @@ void autonomous(void) {
         // lower lift
         MobileGoalMotor.setVelocity(-100,percent);
         MobileGoalMotor.spin(fwd);
-        wait(500, msec); // .6 s
+        wait(800, msec); // .6 s
         MobileGoalMotor.stop();
         wait(250, msec); // .85 s
 
         // drive forward to first goalpost
-        setVelocityAllMotors(50);
+        setVelocityAllMotors(80);
         setDirectionAllMotors(reverse);
         wait(600, msec); // 1.45 s
         setVelocityAllMotors(0);
@@ -344,29 +344,52 @@ void autonomous(void) {
         // run intake
         IntakeMotor.setVelocity(100,percent);
         IntakeMotor.spin(fwd);
-        wait(4000,msec); // 5.85 s
+        wait(3000,msec); // 5.85 s
         IntakeMotor.stop();
+        setVelocityAllMotors(50);
+        setDirectionAllMotors(reverse);
+        IntakeMotor.setVelocity(100,percent);
+        IntakeMotor.spin(fwd);
+        wait(100,msec);
+        IntakeMotor.stop();
+        setVelocityAllMotors(50);
+        setDirectionAllMotors(fwd);
+        IntakeMotor.setVelocity(100,percent);
+        IntakeMotor.spin(fwd);
+        wait(100,msec);
+        IntakeMotor.stop();
+        
+        
 
         // spin 180
-        setVelocityAllMotors(80);
+        /*setVelocityAllMotors(80);
         LeftFrontMotor.spinFor(reverse, 1600, msec);
         LeftBackMotor.spinFor(reverse,1600, msec);
         RightFrontMotor.spinFor(fwd,1600, msec);
         RightBackMotor.spinFor(fwd,1600,msec);
         stopAllMotors();
-        wait(100, msec);
+        wait(100, msec); */
 
         // put goalpost down
+        wait(100,msec);
+        LeftBackMotor.stop(hold);
+        LeftFrontMotor.stop(hold);
+        RightBackMotor.stop(hold);
+        RightFrontMotor.stop(hold);
         MobileGoalMotor.setVelocity(-70,percent);
         MobileGoalMotor.spin(fwd);
-        wait(500, msec);
+        wait(800, msec);
         MobileGoalMotor.stop();
-        wait(100, msec);
+        LeftBackMotor.stop(coast);
+        LeftFrontMotor.stop(coast);
+        RightBackMotor.stop(coast);
+        RightFrontMotor.stop(coast);
+        wait(500, msec);
 
         // back up
-        setVelocityAllMotors(-80);
+        setVelocityAllMotors(-50);
         setDirectionAllMotors(reverse);
-        wait(1000,msec);
+        wait(800,msec);
         stopAllMotors();
 
         
@@ -493,15 +516,25 @@ void usercontrol(void) {
     }
 
     //MobileGoalMotor: L1 toggles
-    if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
+    /*if(!MobileGoalSwitch.pressing() && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalMotor.position(degrees) > -500 && mobileGoalFwd){
+    else if(MobileGoalMotor.position(degrees) > -379.5 && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
       MobileGoalMotor.setVelocity(0, percent); 
+    } */
+  if(Controller1.ButtonL1.pressing()){
+      MobileGoalMotor.setVelocity(100, percent);
+    } 
+    else if(Controller1.ButtonL2.pressing()){
+      MobileGoalMotor.setVelocity(-100, percent);
     }
+    else{
+      MobileGoalMotor.setVelocity(0, percent);
+    }
+    
     
     //spinning motors and activating hydraulics
     LeftBackMotor.spin(fwd);
