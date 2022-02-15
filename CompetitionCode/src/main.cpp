@@ -347,12 +347,21 @@ void usercontrol(void) {
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
+  int avgMotorSpeed = 0;
+
   // User control code here, inside the loop 
   while (true) {
 
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
+    //if the difference between the sticks is within 5
+    if(abs(leftMotorSpeed) - abs(rightMotorSpeed) <= 10){
+      //set the motor outputs to the avg of the two
+      avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
+      leftMotorSpeed = avgMotorSpeed;
+      rightMotorSpeed = avgMotorSpeed;
+    }
 
     //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) < deadzone) {
