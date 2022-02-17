@@ -24,6 +24,8 @@
 // MobileGoalMotor      motor         13              
 // AutoTest             digital_in    C               
 // MobileGoalPot        potV2         D               
+// LiftPot              potV2         E               
+// IVAAD                potV2         H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -162,7 +164,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("MG ANGLE %.2f", MobileGoalPot.angle(degrees));
+      Controller1.Screen.print("VAR %.2f", MobileGoalPot.angle(degrees));
     }
 
 
@@ -496,16 +498,6 @@ void usercontrol(void) {
       IntakeMotor.setVelocity(0, percent);
     }
 
-    // if(Controller1.ButtonL1.pressing() && !MobileGoalSwitch.pressing()){
-    //   MobileGoalMotor.setVelocity(100, percent);
-    // }
-    // else if(Controller1.ButtonL2.pressing()){
-    //   MobileGoalMotor.setVelocity(-100, percent);
-    // }
-    // else{
-    //   MobileGoalMotor.setVelocity(0, percent);
-    // }
-
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
@@ -526,10 +518,10 @@ void usercontrol(void) {
     }
 
     //MobileGoalMotor: L1 toggles
-    if(MobileGoalPot.angle(degrees) > 105 && !mobileGoalFwd){
+    if(MobileGoalPot.angle(degrees) > 140 && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalPot.angle(degrees) < 150  && mobileGoalFwd){
+    else if(MobileGoalPot.angle(degrees) < 200  && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
