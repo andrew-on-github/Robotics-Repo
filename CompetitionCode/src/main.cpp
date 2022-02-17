@@ -34,6 +34,11 @@ using namespace std;
 // A global instance of competition
 competition Competition;
 
+//global motorgroup
+vex::motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
+vex::motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
+vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -74,7 +79,7 @@ void controllerScreen(){
   //declaring and initializing variables for temp control
   double avgTemp = 0;
   double hiTemp = 0;
-  
+
   //delcaring and variables for timer
   int totalSecondsRemaining;
   int minutesRemaining;
