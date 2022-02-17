@@ -464,6 +464,7 @@ void usercontrol(void) {
   double liftTargetAng = 45.28;
   double liftHighAng = 14.02;
   bool liftHigh = false;
+  bool l2Last = false;
 
   //default deadzone value 
   int deadzone = 3;
@@ -518,6 +519,21 @@ void usercontrol(void) {
     //Lift: L2 Toggles between Low and target positions
     //Right toggles target between the highest value and the target value
 
+    //switches lift up when l2 is pressed
+    if(Controller1.ButtonL2.pressing() && !l2Last){
+      liftUp = !liftUp;
+    }
+
+    if(liftUp && LiftPot.angle(degrees) > 45){
+      LiftMotor.setVelocity(100, percent);
+    }
+    else if(!liftUp && LiftPot.angle(degrees) > 101){
+      LiftMotor.setVelocity(-100, percent);
+    }
+    else{
+      LiftMotor.setVelocity(0, percent);
+    }
+
 
 
     //Clamp: R2 toggles
@@ -550,11 +566,14 @@ void usercontrol(void) {
 
     IntakeMotor.spin(fwd);
 
+    LiftMotor.spin(fwd);
+
     ClampPiston.set(clamp);
 
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
     l1Last = Controller1.ButtonL1.pressing();
+    l2Last = Controller1.ButtonL2.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
