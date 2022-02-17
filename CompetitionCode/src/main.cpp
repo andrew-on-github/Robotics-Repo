@@ -164,7 +164,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("VAR %.2f", MobileGoalPot.angle(degrees));
+      Controller1.Screen.print("VAR %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -459,6 +459,12 @@ void usercontrol(void) {
   //mobile goal control var
   bool mobileGoalFwd = false;
 
+  //lift control vars
+  bool liftUp = false;
+  double liftTargetAng = 45.28;
+  double liftHighAng = 14.02;
+  bool liftHigh = false;
+
   //default deadzone value 
   int deadzone = 3;
 
@@ -488,6 +494,7 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
+    //Intake: R1 Fwd Y rev
     if(Controller1.ButtonR1.pressing()){
       IntakeMotor.setVelocity(100, percent);
     }
@@ -507,6 +514,11 @@ void usercontrol(void) {
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
+
+    //Lift: L2 Toggles between Low and target positions
+    //Right toggles target between the highest value and the target value
+
+
 
     //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !clampLast){
