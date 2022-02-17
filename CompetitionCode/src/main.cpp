@@ -37,6 +37,7 @@ competition Competition;
 //global motorgroup
 vex::motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
 vex::motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
+
 vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
 
 /*---------------------------------------------------------------------------*/
@@ -303,6 +304,7 @@ void autonomous(void) {
   preauto = false;
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
+  Brain.Screen.newLine();
   Controller1.Screen.print("AUTO");
 
     switch(selectedAuto){
