@@ -33,6 +33,11 @@ using namespace std;
 // A global instance of competition
 competition Competition;
 
+vex::motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
+vex::motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
+
+vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
+
 // define your global instances of motors and other devices here
 //katie was here
 /*---------------------------------------------------------------------------*/
