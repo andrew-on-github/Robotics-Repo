@@ -14,16 +14,16 @@
 // Controller1          controller                    
 // MenuCycle            limit         A               
 // MenuSelect           limit         B               
-// LeftFrontMotor       motor         19              
-// LeftBackMotor        motor         9               
+// LeftFrontMotor       motor         15              
+// LeftBackMotor        motor         8               
 // RightFrontMotor      motor         12              
-// RightBackMotor       motor         3               
+// RightBackMotor       motor         7               
 // ClampPiston          digital_out   F               
 // IntakeMotor          motor         18              
 // LiftMotor            motor         4               
 // MobileGoalMotor      motor         13              
-// AutoTest             digital_in    E               
-// MobileGoalSwitch     limit         C               
+// AutoTest             digital_in    C               
+// MobileGoalPot        potV2         D               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"

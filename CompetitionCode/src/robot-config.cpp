@@ -19,9 +19,8 @@ digital_out ClampPiston = digital_out(Brain.ThreeWirePort.F);
 motor IntakeMotor = motor(PORT18, ratio18_1, true);
 motor LiftMotor = motor(PORT4, ratio18_1, false);
 motor MobileGoalMotor = motor(PORT13, ratio18_1, true);
-digital_in AutoTest = digital_in(Brain.ThreeWirePort.E);
-limit MobileGoalSwitch = limit(Brain.ThreeWirePort.C);
-pot MobileGoalPot = pot(Brain.ThreeWirePort.D);
+digital_in AutoTest = digital_in(Brain.ThreeWirePort.C);
+potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.D);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

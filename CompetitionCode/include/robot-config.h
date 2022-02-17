@@ -15,8 +15,7 @@ extern motor IntakeMotor;
 extern motor LiftMotor;
 extern motor MobileGoalMotor;
 extern digital_in AutoTest;
-extern limit MobileGoalSwitch;
-extern pot MobileGoalPot;
+extern potV2 MobileGoalPot;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
