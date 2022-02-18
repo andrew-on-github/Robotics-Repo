@@ -100,7 +100,7 @@ void mobileGoalFSA(){
 }
 
 const double MC_THRESHOLD_LIFT_UP = 10;
-const double MC_THRESHOLD_LIFT_DOWN = 0;
+const double MC_THRESHOLD_LIFT_DOWN = -1;
 
 //true = right arrow high toggle, false = l2 low toggle
 void liftFSA(bool isHighToggle){

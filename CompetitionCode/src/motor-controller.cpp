@@ -16,7 +16,7 @@ void controlMotor(void *arg) {
     double thresh = mc -> getMaxSpeedThresh();
 
     int speed = (int)((targetVal - currentVal) / tau);
-    if (speed < -100 || (speed<0 && fabs(targetVal - currentVal) > thresh))
+    if (speed < -100 || (speed < 0 && fabs(targetVal - currentVal) > thresh))
       speed = -100;
     if (speed > 100 || (speed > 0 && fabs(targetVal - currentVal) > thresh))
       speed = 100;
@@ -26,9 +26,9 @@ void controlMotor(void *arg) {
 
     if(mc->getEnabled()){
       controlledMotor->setVelocity(speed, percent);
-      controlledMotor->spin(fwd);
+      //controlledMotor->spin(fwd);
     }
-    //printf("%p %f %f %d \n", arg, targetVal, currentVal, speed);
+    printf("%p %f %f %d \n", arg, targetVal, currentVal, speed);
     wait(WAIT_TIME, msec);
   }
 }
@@ -42,7 +42,7 @@ MotorController::MotorController(motor *cm, potV2 *cP, double *tv,
   controlledPot = cP;
   targetValue = tv;
   this->tau = tau;
-  maxSpeedThresh = 0;
+  maxSpeedThresh = -1;
 
   enabled = false;
 }
