@@ -68,9 +68,20 @@ const double EPSILON = 1E-5;
 // target angle of the mobile goal
 const double MOBILE_GOAL_EXTENDED = 200;
 const double MOBILE_GOAL_RETRACTED = 140;
+double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
 
 //declaring and initializing preauto flag
 bool preauto = true;
+
+void mobileGoalFSA(){
+ if(fabs(mobileGoalTarget - MOBILE_GOAL_EXTENDED) < EPSILON) {
+   mobileGoalTarget = MOBILE_GOAL_RETRACTED;
+   
+ }
+ else{
+   mobileGoalTarget = MOBILE_GOAL_EXTENDED;
+ }
+}
 
 //true = right arrow high toggle, false = l2 low toggle
 void liftFSA(bool isHighToggle){
