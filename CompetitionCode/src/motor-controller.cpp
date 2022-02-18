@@ -1,44 +1,49 @@
-// #include "vex.h"
+#include "motor-controller.h"
 
-// using namespace vex;
-// using namespace std;
+using namespace vex;
+using namespace std;
 
-// class MotorController{
-//   motor* controlledMotor;
-//   double* controlledValue;
-//   double targetValue;
+const double WAIT_TIME = 25; // msec
 
-//   public:
-//     MotorController(motor* cm, double* cv, double tv){
+void controlMotor(void *arg) {
+  MotorController *mc = (MotorController *)arg;
+  double tau = mc->getTau();
+  motor *controlledMotor = mc->getControlledMotor();
 
-//       new thread(controlMotor);
+  while (true) {
+    double targetVal = mc->getTargetValue();
+    double currentVal = mc->getControlledValue();
 
-//       controlledMotor = cm;
-//       controlledValue = cv;
-//       targetValue = tv;
-//     }
+    int speed = (int)((targetVal - currentVal) / tau);
+    if (speed < -100)
+      speed = -100;
+    if (speed > 100)
+      speed = 100;
+    controlledMotor->setVelocity(speed, percent);
+    controlledMotor->spin(fwd);
 
-//     //accessors
+    wait(WAIT_TIME, msec);
+  }
+}
 
-//     //returns pointer to motor
-//     motor* getControlledMotor(){
-//       return controlledMotor;
-//     }
+MotorController::MotorController(motor *cm, double *cv, double *tv,
+                                 double tau) {
 
-//     //returns controlledValue
-//     double getControlledValue(){
-//       return *controlledValue;
-//     }
+  new thread(controlMotor, this);
 
-//     //returns targetValue
-//     double getTargetValue(){
-//       return targetValue;
-//     }
+  controlledMotor = cm;
+  controlledValue = cv;
+  targetValue = tv;
+  this->tau = tau;
+}
 
-//     //accessors
+motor *MotorController::getControlledMotor() { return controlledMotor; }
 
-//     motor* setControlledValue
+// returns controlledValue
+double MotorController::getControlledValue() { return *controlledValue; }
 
+// returns targetValue
+double MotorController::getTargetValue() { return *targetValue; }
 
-
-// };
+// returns tau
+double MotorController::getTau() { return tau; }
