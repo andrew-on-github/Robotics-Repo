@@ -26,7 +26,7 @@ void controlMotor(void *arg) {
 
     if(mc->getEnabled()){
       controlledMotor->setVelocity(speed, percent);
-      //controlledMotor->spin(fwd);
+      controlledMotor->spin(fwd);
     }
     printf("%p %f %f %d \n", arg, targetVal, currentVal, speed);
     wait(WAIT_TIME, msec);
@@ -42,7 +42,7 @@ MotorController::MotorController(motor *cm, potV2 *cP, double *tv,
   controlledPot = cP;
   targetValue = tv;
   this->tau = tau;
-  maxSpeedThresh = -1;
+  maxSpeedThresh = 1000000;
 
   enabled = false;
 }

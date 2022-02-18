@@ -69,11 +69,11 @@ int clampActuations = 0;
 
 // target angle of the lift
 const double LIFT_HIGH_POSITION = 14;
-const double LIFT_LOW_POSITION = 105;
+const double LIFT_LOW_POSITION = 102;
 const double LIFT_MID_POSITION = 45;
 
-const double LIFT_TAU = 0.1;
-const double MOBILE_GOAL_TAU = 0.125;
+const double LIFT_TAU = 0.25;
+const double MOBILE_GOAL_TAU = 0.25;
 
 double liftTarget = LIFT_LOW_POSITION;
 
@@ -100,7 +100,7 @@ void mobileGoalFSA(){
 }
 
 const double MC_THRESHOLD_LIFT_UP = 10;
-const double MC_THRESHOLD_LIFT_DOWN = -1;
+const double MC_THRESHOLD_LIFT_DOWN = 1000000;
 
 //true = right arrow high toggle, false = l2 low toggle
 void liftFSA(bool isHighToggle){
