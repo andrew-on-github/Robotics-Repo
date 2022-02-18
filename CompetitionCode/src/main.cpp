@@ -465,6 +465,14 @@ void autonomous(void) {
       case 1:
         Brain.Screen.print("1");
         Controller1.Screen.print("AUTO 1");
+        
+        //Stop hold on DT
+        DriveMotorGroup.stop();
+        wait(100, msec);
+
+        liftFSA(true);
+        
+
         break;
 
       case 2:
