@@ -31,6 +31,8 @@
 
 #include "vex.h"
 
+#include "motor-controller.h"
+
 using namespace vex;
 using namespace std;
 
@@ -42,6 +44,11 @@ motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
 motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
 
 motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
+
+//motor controller objects 
+MotorController* LiftMotorController;
+MotorController* MobileGoalMotorController;
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -51,6 +58,8 @@ motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, Righ
 /*  function is only called once after the V5 has been powered on and        */
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
+
+
 
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
@@ -62,7 +71,13 @@ int clampActuations = 0;
 const double LIFT_HIGH_POSITION = 14;
 const double LIFT_LOW_POSITION = 100;
 const double LIFT_MID_POSITION = 45;
+
+const double LIFT_TAU = 1.0;
+const double MOBILE_GOAL_TAU = 1.0;
+
 double liftTarget = LIFT_LOW_POSITION;
+
+
 const double EPSILON = 1E-5;
 
 // target angle of the mobile goal
@@ -242,6 +257,10 @@ void pre_auton(void) {
 
   //true when autonomous is "locked in" false when still selecting
   bool selected = false;
+
+  //initializing motor controllers
+  LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
+  MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
@@ -471,7 +490,7 @@ void autonomous(void) {
         wait(100, msec);
 
         liftFSA(true);
-        
+
 
         break;
 
@@ -532,7 +551,7 @@ void usercontrol(void) {
   bool rightLast = false;
 
   //mobile goal control var
-  bool mobileGoalFwd = false;
+  //bool mobileGoalFwd = false;
 
   //default deadzone value 
   int deadzone = 3;
@@ -601,42 +620,25 @@ void usercontrol(void) {
       if(!clamp){
         clampActuations++;
       }
-      if(clamp){
-        printf("clamp true");
-      }
-      else{
-        printf("clamp false");
-      }
-    }
-
-    if(Controller1.ButtonL1.pressing() && !l1Last){
-      mobileGoalFwd = !mobileGoalFwd;
     }
 
     //MobileGoalMotor: L1 toggles
-    if(MobileGoalPot.angle(degrees) > MOBILE_GOAL_RETRACTED && !mobileGoalFwd){
-      MobileGoalMotor.setVelocity(100, percent);
+    if(Controller1.ButtonL1.pressing() && !l1Last){
+      mobileGoalFSA();
     }
-    else if(MobileGoalPot.angle(degrees) < MOBILE_GOAL_EXTENDED  && mobileGoalFwd){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else{
-      MobileGoalMotor.setVelocity(0, percent); 
-    }
+
+
     
     //spinning motors and activating hydraulics
-    // LeftBackMotor.spin(fwd);
-    // LeftFrontMotor.spin(fwd);
-    // RightBackMotor.spin(fwd);
-    // RightFrontMotor.spin(fwd);
+    LeftBackMotor.spin(fwd);
+    LeftFrontMotor.spin(fwd);
+    RightBackMotor.spin(fwd);
+    RightFrontMotor.spin(fwd);
 
-    // MobileGoalMotor.spin(fwd);
-
-    // IntakeMotor.spin(fwd);
+    IntakeMotor.spin(fwd);
 
     ClampPiston.set(clamp);
 
-    // LiftMotor.spin(fwd);
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
     l1Last = Controller1.ButtonL1.pressing();

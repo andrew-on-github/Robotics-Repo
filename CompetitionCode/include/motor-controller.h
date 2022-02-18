@@ -6,12 +6,12 @@
 
 class MotorController {
     motor* controlledMotor;
-    double* controlledValue;
+    potV2* controlledPot; 
     double* targetValue;
     double tau;
 
   public:
-    MotorController(motor* cm, double* cv, double* tv, double tau);
+    MotorController(motor* cm, potV2* cP, double* tv, double tau);
     
     //accessors
     //returns pointer to motor
@@ -21,6 +21,6 @@ class MotorController {
     double getTau();
 };
 
-void controlMotor(MotorController mc)
+void controlMotor(MotorController mc);
 
 #endif // MOTOR_CONTROLLER_H

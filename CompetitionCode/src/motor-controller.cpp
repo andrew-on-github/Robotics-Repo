@@ -26,13 +26,13 @@ void controlMotor(void *arg) {
   }
 }
 
-MotorController::MotorController(motor *cm, double *cv, double *tv,
+MotorController::MotorController(motor *cm, potV2 *cP, double *tv,
                                  double tau) {
 
   new thread(controlMotor, this);
 
   controlledMotor = cm;
-  controlledValue = cv;
+  controlledPot = cP;
   targetValue = tv;
   this->tau = tau;
 }
@@ -40,7 +40,7 @@ MotorController::MotorController(motor *cm, double *cv, double *tv,
 motor *MotorController::getControlledMotor() { return controlledMotor; }
 
 // returns controlledValue
-double MotorController::getControlledValue() { return *controlledValue; }
+double MotorController::getControlledValue() { return controlledPot->angle(degrees); }
 
 // returns targetValue
 double MotorController::getTargetValue() { return *targetValue; }
