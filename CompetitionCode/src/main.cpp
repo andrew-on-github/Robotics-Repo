@@ -268,6 +268,10 @@ void pre_auton(void) {
   //true when autonomous is "locked in" false when still selecting
   bool selected = false;
 
+  //initializing motor controllers
+  LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
+  MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
+
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
 
