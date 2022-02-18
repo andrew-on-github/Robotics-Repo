@@ -29,6 +29,8 @@
 
 #include "vex.h"
 
+#include "motor-controller.h"
+
 using namespace vex;
 using namespace std;
 
@@ -56,8 +58,85 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 int selectedAuto = 0;
 
 
+//motor controller objects 
+MotorController* LiftMotorController;
+MotorController* MobileGoalMotorController;
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+//global to count the number of actuations of clamp
+int clampActuations = 0;
+
+// target angle of the lift
+const double LIFT_HIGH_POSITION = 14;
+const double LIFT_LOW_POSITION = 102;
+const double LIFT_MID_POSITION = 45;
+
+const double LIFT_TAU = 0.25;
+const double MOBILE_GOAL_TAU = 0.25;
+
+double liftTarget = LIFT_LOW_POSITION;
+
+
+const double EPSILON = 1E-5;
+
+// target angle of the mobile goal
+const double MOBILE_GOAL_EXTENDED = 216;
+const double MOBILE_GOAL_RETRACTED = 132;
+double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
+
 //declaring and initializing preauto flag
 bool preauto = true;
+
+void mobileGoalFSA(){
+ if(fabs(mobileGoalTarget - MOBILE_GOAL_EXTENDED) < EPSILON) {
+   mobileGoalTarget = MOBILE_GOAL_RETRACTED;
+   MobileGoalMotorController->setOverRidePercent(-100);
+   MobileGoalMotorController->setOverRideCycles(15);
+ }
+ else{
+   mobileGoalTarget = MOBILE_GOAL_EXTENDED;
+ }
+}
+
+const double MC_THRESHOLD_LIFT_UP = 10;
+const double MC_THRESHOLD_LIFT_DOWN = 1000000;
+
+//true = right arrow high toggle, false = l2 low toggle
+void liftFSA(bool isHighToggle){
+  if(isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
+    liftTarget = LIFT_HIGH_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
+  }
+  else if(isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
+    liftTarget = LIFT_MID_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
+  }
+  else if(isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
+    liftTarget = LIFT_HIGH_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
+  }
+  else if(!isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
+    liftTarget = LIFT_LOW_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
+  }
+  else if(!isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
+    liftTarget = LIFT_LOW_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
+  }
+  else if(!isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
+    liftTarget = LIFT_MID_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
+  }
+}
 
 int controllerCurve(int input, double curve){
   
