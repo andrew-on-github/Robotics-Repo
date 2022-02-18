@@ -69,11 +69,11 @@ int clampActuations = 0;
 
 // target angle of the lift
 const double LIFT_HIGH_POSITION = 14;
-const double LIFT_LOW_POSITION = 100;
+const double LIFT_LOW_POSITION = 105;
 const double LIFT_MID_POSITION = 45;
 
-const double LIFT_TAU = 1.0;
-const double MOBILE_GOAL_TAU = 1.0;
+const double LIFT_TAU = 0.1;
+const double MOBILE_GOAL_TAU = 0.125;
 
 double liftTarget = LIFT_LOW_POSITION;
 
@@ -81,8 +81,8 @@ double liftTarget = LIFT_LOW_POSITION;
 const double EPSILON = 1E-5;
 
 // target angle of the mobile goal
-const double MOBILE_GOAL_EXTENDED = 200;
-const double MOBILE_GOAL_RETRACTED = 140;
+const double MOBILE_GOAL_EXTENDED = 216;
+const double MOBILE_GOAL_RETRACTED = 132;
 double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
 
 //declaring and initializing preauto flag
@@ -91,32 +91,42 @@ bool preauto = true;
 void mobileGoalFSA(){
  if(fabs(mobileGoalTarget - MOBILE_GOAL_EXTENDED) < EPSILON) {
    mobileGoalTarget = MOBILE_GOAL_RETRACTED;
-   
+   MobileGoalMotorController->setOverRidePercent(-100);
+   MobileGoalMotorController->setOverRideCycles(15);
  }
  else{
    mobileGoalTarget = MOBILE_GOAL_EXTENDED;
  }
 }
 
+const double MC_THRESHOLD_LIFT_UP = 10;
+const double MC_THRESHOLD_LIFT_DOWN = 0;
+
 //true = right arrow high toggle, false = l2 low toggle
 void liftFSA(bool isHighToggle){
   if(isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
     liftTarget = LIFT_HIGH_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
   }
   else if(isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
     liftTarget = LIFT_MID_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
   }
   else if(isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
     liftTarget = LIFT_HIGH_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
   }
   else if(!isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
     liftTarget = LIFT_LOW_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
   }
   else if(!isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
     liftTarget = LIFT_LOW_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
   }
   else if(!isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
     liftTarget = LIFT_MID_POSITION;
+    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
   }
 }
 
@@ -379,6 +389,9 @@ void autonomous(void) {
   //updating flag to cause preauton method to exit
   preauto = false;
 
+  LiftMotorController->setEnabled(true);
+  MobileGoalMotorController->setEnabled(true);
+
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Brain.Screen.newLine();
   Controller1.Screen.print("AUTO");
@@ -530,6 +543,10 @@ void usercontrol(void) {
 
   //updating flag to cause preauton method to exit
   preauto = false;
+
+  //allowing motor controllers to control their motors
+  LiftMotorController->setEnabled(true);
+  MobileGoalMotorController->setEnabled(true);
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
