@@ -201,7 +201,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("CLAMP CYCLES: %d", thread::hardware_concurrency());
+      Controller1.Screen.print("LIFT TARGET: %.2f", liftTarget);
     }
 
 
@@ -499,6 +499,12 @@ void usercontrol(void) {
   //last value of the l2 button
   bool l2Last = false;
 
+  //last value of the y button
+  bool yLast = false;
+
+  //last value of the right button
+  bool rightLast = false;
+
   //mobile goal control var
   bool mobileGoalFwd = false;
 
@@ -532,16 +538,6 @@ void usercontrol(void) {
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
     }
 
-    //Intake: R1 Fwd Y rev
-    if(Controller1.ButtonR1.pressing()){
-      IntakeMotor.setVelocity(100, percent);
-    }
-    else if(Controller1.ButtonY.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
-    }
-    else{
-      IntakeMotor.setVelocity(0, percent);
-    }
 
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
@@ -555,11 +551,27 @@ void usercontrol(void) {
 
     //Lift: L2 Toggles between Low and target positions
     //Right toggles target between the highest value and the target value
+    if(Controller1.ButtonL2.pressing() && !l2Last){
+      liftFSA(true);
+    }
+    else if(Controller1.ButtonRight.pressing() && !rightLast){
+      liftFSA(false);
+    }
+
+    //Intake: R1 Fwd Y rev
+    if(Controller1.ButtonR1.pressing()){
+      IntakeMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonY.pressing()){
+      IntakeMotor.setVelocity(-100, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
 
     //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !clampLast){
       clamp = !clamp;
-      ClampPiston.set(clamp);
       if(!clamp){
         clampActuations++;
       }
@@ -596,11 +608,15 @@ void usercontrol(void) {
 
     // IntakeMotor.spin(fwd);
 
+    //ClampPiston.set(clamp);
+
     // LiftMotor.spin(fwd);
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
     l1Last = Controller1.ButtonL1.pressing();
     l2Last = Controller1.ButtonL2.pressing();
+    yLast = Controller1.ButtonY.pressing();
+    rightLast = Controller1.ButtonRight.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
