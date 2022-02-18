@@ -59,16 +59,32 @@ int selectedAuto = 0;
 int clampActuations = 0;
 
 
+//target angle of the lift
+double liftTarget = 100;
+
 //declaring and initializing preauto flag
 bool preauto = true;
 
-void raiseLift(){
-  LiftMotor.setVelocity(100, percent);
-  LiftMotor.spin(fwd);
-  while(LiftPot.angle(degrees) < 101){
-    wait(25, msec);
+//true = l2, false = right arrow
+void liftFSA(bool buttonPressed){
+  if(buttonPressed && liftTarget == 100){
+    liftTarget = 45;
   }
-  LiftMotor.stop();
+  else if(buttonPressed && liftTarget == 14){
+    liftTarget = 15;
+  }
+  else if(buttonPressed && liftTarget == 45){
+    liftTarget = 100;
+  }
+  else if(!buttonPressed && liftTarget == 45){
+    liftTarget = 15;
+  }
+  else if(!buttonPressed && liftTarget == 15){
+    liftTarget = 45;
+  }
+  else if(!buttonPressed && liftTarget == 100){
+    liftTarget = 15;
+  }
 }
 
 void lowerLift(){
@@ -185,7 +201,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("CLAMP CYCLES: %d", clampActuations);
+      Controller1.Screen.print("CLAMP CYCLES: %d", thread::hardware_concurrency());
     }
 
 
@@ -480,15 +496,11 @@ void usercontrol(void) {
   //declaring and initializing mobile goal variables
   bool l1Last = false;
 
+  //last value of the l2 button
+  bool l2Last = false;
+
   //mobile goal control var
   bool mobileGoalFwd = false;
-
-  //lift control vars
-  bool liftUp = false;
-  double liftTargetAng = 45.28;
-  double liftHighAng = 14.02;
-  bool liftHigh = false;
-  bool l2Last = false;
 
   //default deadzone value 
   int deadzone = 3;
@@ -496,6 +508,7 @@ void usercontrol(void) {
   //declaring motor speed vars
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
+
 
   // User control code here, inside the loop 
   while (true) {
@@ -542,23 +555,6 @@ void usercontrol(void) {
 
     //Lift: L2 Toggles between Low and target positions
     //Right toggles target between the highest value and the target value
-
-    //switches lift up when l2 is pressed
-    if(Controller1.ButtonL2.pressing() && !l2Last){
-      liftUp = !liftUp;
-    }
-
-    if(liftUp && LiftPot.angle(degrees) > 45){
-      LiftMotor.setVelocity(100, percent);
-    }
-    else if(!liftUp && LiftPot.angle(degrees) > 101){
-      LiftMotor.setVelocity(-100, percent);
-    }
-    else{
-      LiftMotor.setVelocity(0, percent);
-    }
-
-
 
     //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !clampLast){
