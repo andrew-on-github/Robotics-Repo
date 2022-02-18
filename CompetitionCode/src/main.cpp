@@ -201,7 +201,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("LIFT TARGET: %.2f", liftTarget);
+      Controller1.Screen.print("LIFT ANGLE: %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -608,7 +608,7 @@ void usercontrol(void) {
 
     // IntakeMotor.spin(fwd);
 
-    //ClampPiston.set(clamp);
+    ClampPiston.set(clamp);
 
     // LiftMotor.spin(fwd);
     //update clamplast so inputs arent counted multiple times

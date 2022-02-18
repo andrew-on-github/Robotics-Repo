@@ -15,6 +15,8 @@
 #include "v5.h"
 #include "v5_vcs.h"
 
+#include "motor-controller.h"
+
 #include "robot-config.h"
 
 #define waitUntil(condition)                                                   \
