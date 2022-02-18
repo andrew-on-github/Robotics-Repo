@@ -12,17 +12,19 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// MenuCycle            limit         A               
-// MenuSelect           limit         B               
-// LeftFrontMotor       motor         1               
-// LeftBackMotor        motor         2               
-// RightFrontMotor      motor         9               
-// RightBackMotor       motor         10              
-// ClampPiston          digital_out   C               
-// IntakeMotor          motor         11              
+// MenuCycle            limit         D               
+// MenuSelect           limit         E               
+// LeftFrontMotor       motor         2               
+// LeftBackMotor        motor         11              
+// RightFrontMotor      motor         8               
+// RightBackMotor       motor         18              
 // LiftMotor            motor         12              
-// MobileGoalMotor      motor         13              
-// AutoTest             digital_in    E               
+// MobileGoalMotor      motor         1               
+// AutoTest             digital_in    H               
+// ClampMotor           motor         3               
+// LiftPot              potV2         A               
+// MobileGoalPot        potV2         B               
+// ClampPot             pot           C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -422,8 +424,6 @@ void usercontrol(void) {
     RightFrontMotor.spin(fwd);
     
     MobileGoalMotor.spin(fwd);
-
-    ClampPiston.set(clamp);
 
     
     //update clamplast so inputs arent counted multiple times

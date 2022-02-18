@@ -9,17 +9,19 @@ brain  Brain;
 
 // VEXcode device constructors
 controller Controller1 = controller(primary);
-limit MenuCycle = limit(Brain.ThreeWirePort.A);
-limit MenuSelect = limit(Brain.ThreeWirePort.B);
-motor LeftFrontMotor = motor(PORT1, ratio18_1, false);
-motor LeftBackMotor = motor(PORT2, ratio18_1, false);
-motor RightFrontMotor = motor(PORT9, ratio18_1, true);
-motor RightBackMotor = motor(PORT10, ratio18_1, true);
-digital_out ClampPiston = digital_out(Brain.ThreeWirePort.C);
-motor IntakeMotor = motor(PORT11, ratio18_1, false);
+limit MenuCycle = limit(Brain.ThreeWirePort.D);
+limit MenuSelect = limit(Brain.ThreeWirePort.E);
+motor LeftFrontMotor = motor(PORT2, ratio18_1, false);
+motor LeftBackMotor = motor(PORT11, ratio18_1, false);
+motor RightFrontMotor = motor(PORT8, ratio18_1, true);
+motor RightBackMotor = motor(PORT18, ratio18_1, true);
 motor LiftMotor = motor(PORT12, ratio18_1, false);
-motor MobileGoalMotor = motor(PORT13, ratio18_1, true);
-digital_in AutoTest = digital_in(Brain.ThreeWirePort.E);
+motor MobileGoalMotor = motor(PORT1, ratio18_1, true);
+digital_in AutoTest = digital_in(Brain.ThreeWirePort.H);
+motor ClampMotor = motor(PORT3, ratio18_1, true);
+potV2 LiftPot = potV2(Brain.ThreeWirePort.A);
+potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.B);
+pot ClampPot = pot(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
