@@ -58,12 +58,16 @@ int selectedAuto = 0;
 //global to count the number of actuations of clamp
 int clampActuations = 0;
 
-//target angle of the lift
+// target angle of the lift
 const double LIFT_HIGH_POSITION = 14;
 const double LIFT_LOW_POSITION = 100;
 const double LIFT_MID_POSITION = 45;
-double liftTarget = 100;
+double liftTarget = LIFT_LOW_POSITION;
 const double EPSILON = 1E-5;
+
+// target angle of the mobile goal
+const double MOBILE_GOAL_EXTENDED = 200;
+const double MOBILE_GOAL_RETRACTED = 140;
 
 //declaring and initializing preauto flag
 bool preauto = true;
@@ -591,10 +595,10 @@ void usercontrol(void) {
     }
 
     //MobileGoalMotor: L1 toggles
-    if(MobileGoalPot.angle(degrees) > 140 && !mobileGoalFwd){
+    if(MobileGoalPot.angle(degrees) > MOBILE_GOAL_RETRACTED && !mobileGoalFwd){
       MobileGoalMotor.setVelocity(100, percent);
     }
-    else if(MobileGoalPot.angle(degrees) < 200  && mobileGoalFwd){
+    else if(MobileGoalPot.angle(degrees) < MOBILE_GOAL_EXTENDED  && mobileGoalFwd){
       MobileGoalMotor.setVelocity(-100, percent);
     }
     else{
