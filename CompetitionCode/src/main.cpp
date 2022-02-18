@@ -58,32 +58,35 @@ int selectedAuto = 0;
 //global to count the number of actuations of clamp
 int clampActuations = 0;
 
-
 //target angle of the lift
+const double LIFT_HIGH_POSITION = 14;
+const double LIFT_LOW_POSITION = 100;
+const double LIFT_MID_POSITION = 45;
 double liftTarget = 100;
+const double EPSILON = 1E-5;
 
 //declaring and initializing preauto flag
 bool preauto = true;
 
-//true = l2, false = right arrow
-void liftFSA(bool buttonPressed){
-  if(buttonPressed && liftTarget == 100){
-    liftTarget = 45;
+//true = right arrow high toggle, false = l2 low toggle
+void liftFSA(bool isHighToggle){
+  if(isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
+    liftTarget = LIFT_HIGH_POSITION;
   }
-  else if(buttonPressed && liftTarget == 14){
-    liftTarget = 15;
+  else if(isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
+    liftTarget = LIFT_MID_POSITION;
   }
-  else if(buttonPressed && liftTarget == 45){
-    liftTarget = 100;
+  else if(isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
+    liftTarget = LIFT_HIGH_POSITION;
   }
-  else if(!buttonPressed && liftTarget == 45){
-    liftTarget = 15;
+  else if(!isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
+    liftTarget = LIFT_LOW_POSITION;
   }
-  else if(!buttonPressed && liftTarget == 15){
-    liftTarget = 45;
+  else if(!isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
+    liftTarget = LIFT_LOW_POSITION;
   }
-  else if(!buttonPressed && liftTarget == 100){
-    liftTarget = 15;
+  else if(!isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
+    liftTarget = LIFT_MID_POSITION;
   }
 }
 
@@ -552,10 +555,10 @@ void usercontrol(void) {
     //Lift: L2 Toggles between Low and target positions
     //Right toggles target between the highest value and the target value
     if(Controller1.ButtonL2.pressing() && !l2Last){
-      liftFSA(true);
+      liftFSA(false);
     }
     else if(Controller1.ButtonRight.pressing() && !rightLast){
-      liftFSA(false);
+      liftFSA(true);
     }
 
     //Intake: R1 Fwd Y rev
