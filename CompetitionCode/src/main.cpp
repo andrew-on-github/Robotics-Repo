@@ -420,6 +420,10 @@ void usercontrol(void) {
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
+  //allowing motor controllers to control their motors
+  LiftMotorController->setEnabled(true);
+  MobileGoalMotorController->setEnabled(true);
+
   //declaring and initializing clamp variables
   bool clamp = false;
   bool clampLast = false;
