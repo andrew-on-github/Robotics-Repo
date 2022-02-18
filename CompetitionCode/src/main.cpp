@@ -18,7 +18,6 @@
 // LeftBackMotor        motor         8               
 // RightFrontMotor      motor         12              
 // RightBackMotor       motor         7               
-// ClampPiston          digital_out   F               
 // IntakeMotor          motor         18              
 // LiftMotor            motor         4               
 // MobileGoalMotor      motor         13              
@@ -26,6 +25,8 @@
 // MobileGoalPot        potV2         D               
 // LiftPot              potV2         E               
 // IVAAD                potV2         H               
+// RightClampPiston     pneumatics    G   
+// LeftClampPiston      pneumatics    F            
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -37,11 +38,10 @@ using namespace std;
 competition Competition;
 
 //global motorgroup
-vex::motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
-vex::motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
+motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
+motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
 
-vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
-
+motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -55,9 +55,30 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
+//global to count the number of actuations of clamp
+int clampActuations = 0;
+
 
 //declaring and initializing preauto flag
 bool preauto = true;
+
+void raiseLift(){
+  LiftMotor.setVelocity(100, percent);
+  LiftMotor.spin(fwd);
+  while(LiftPot.angle(degrees) < 101){
+    wait(25, msec);
+  }
+  LiftMotor.stop();
+}
+
+void lowerLift(){
+  LiftMotor.setVelocity(-100, percent);
+  LiftMotor.spin(fwd);
+  while(LiftPot.angle(degrees) > 45 ){
+    wait(25, msec);
+  }
+  LiftMotor.stop();
+}
 
 int controllerCurve(int input, double curve){
   
@@ -164,7 +185,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("VAR %.2f", LiftPot.angle(degrees));
+      Controller1.Screen.print("CLAMP CYCLES: %d", clampActuations);
     }
 
 
@@ -443,6 +464,9 @@ void autonomous(void) {
 void usercontrol(void) {
   new thread(controllerScreen);
 
+  //resetting clampactuations
+  clampActuations = 0;
+
   //updating flag to cause preauton method to exit
   preauto = false;
 
@@ -539,6 +563,16 @@ void usercontrol(void) {
     //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !clampLast){
       clamp = !clamp;
+      ClampPiston.set(clamp);
+      if(!clamp){
+        clampActuations++;
+      }
+      if(clamp){
+        printf("clamp true");
+      }
+      else{
+        printf("clamp false");
+      }
     }
 
     if(Controller1.ButtonL1.pressing() && !l1Last){
@@ -557,19 +591,16 @@ void usercontrol(void) {
     }
     
     //spinning motors and activating hydraulics
-    LeftBackMotor.spin(fwd);
-    LeftFrontMotor.spin(fwd);
-    RightBackMotor.spin(fwd);
-    RightFrontMotor.spin(fwd);
+    // LeftBackMotor.spin(fwd);
+    // LeftFrontMotor.spin(fwd);
+    // RightBackMotor.spin(fwd);
+    // RightFrontMotor.spin(fwd);
 
-    MobileGoalMotor.spin(fwd);
+    // MobileGoalMotor.spin(fwd);
 
-    IntakeMotor.spin(fwd);
+    // IntakeMotor.spin(fwd);
 
-    LiftMotor.spin(fwd);
-
-    ClampPiston.set(clamp);
-
+    // LiftMotor.spin(fwd);
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
     l1Last = Controller1.ButtonL1.pressing();

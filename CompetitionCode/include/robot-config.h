@@ -10,7 +10,6 @@ extern motor LeftFrontMotor;
 extern motor LeftBackMotor;
 extern motor RightFrontMotor;
 extern motor RightBackMotor;
-extern digital_out ClampPiston;
 extern motor IntakeMotor;
 extern motor LiftMotor;
 extern motor MobileGoalMotor;
@@ -18,6 +17,7 @@ extern digital_in AutoTest;
 extern potV2 MobileGoalPot;
 extern potV2 LiftPot;
 extern potV2 IVAAD;
+extern pneumatics ClampPiston;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
