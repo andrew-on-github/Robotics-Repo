@@ -381,17 +381,25 @@ void autonomous(void) {
   //updating flag to cause preauton method to exit
   preauto = false;
 
+  LiftMotorController->setEnabled(true);
+  MobileGoalMotorController->setEnabled(true);
+  ClampMotorController->setEnabled(true);
+
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
 
-  while(true){
     switch(selectedAuto){
       case 0:
         //wheel circumfrence = 12.56637", divide travel distance in inches by wheel circumfrence constatn"
-        mobileGoalTarget = MOBILE_GOAL_EXTENDED;
-        DriveMotorGroup.spinFor(fwd, 30 / WHEEL_CIRCUMFRENCE, rev);
-        mobileGoalTarget = MOBILE_GOAL_RETRACTED;
-        DriveMotorGroup.spinFor(reverse, 30 / WHEEL_CIRCUMFRENCE, rev);
+        mobileGoalFSA();
+        DriveMotorGroup.spinFor(vex::forward, 80 / WHEEL_CIRCUMFRENCE, rev, 60 * 30 / WHEEL_CIRCUMFRENCE / .85, rpm, false);
+        wait(1.75, sec);
+        mobileGoalFSA();
+        wait(1, sec);
+        DriveMotorGroup.spinFor(reverse, 75 / WHEEL_CIRCUMFRENCE, rev, 60 * 30 / WHEEL_CIRCUMFRENCE, rpm, false);
+        wait(1, sec);
+        mobileGoalFSA();
+
         break;
       
       case 1:
@@ -410,8 +418,9 @@ void autonomous(void) {
         Brain.Screen.print("error");
         break;
     }
-    Brain.Screen.clearScreen();
-  }
+  LiftMotorController->setEnabled(false);
+  MobileGoalMotorController->setEnabled(false);
+  ClampMotorController->setEnabled(false);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -463,7 +472,7 @@ void usercontrol(void) {
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
     //if the absolute difference between the sticks is within 10, and they have the same sign
-    if((abs(leftMotorSpeed) - abs(rightMotorSpeed) <= 10) && (leftMotorSpeed >= 0) == (rightMotorSpeed >= 0)){
+    if((abs(leftMotorSpeed - rightMotorSpeed) <= 10)){
       //set the motor outputs to the avg of the two
       avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
       leftMotorSpeed = avgMotorSpeed;
