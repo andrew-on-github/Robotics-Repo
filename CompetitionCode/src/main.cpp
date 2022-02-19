@@ -473,7 +473,7 @@ void usercontrol(void) {
         LeftBackMotor.stop(hold);
         LeftFrontMotor.stop(hold);
       }
-      else if(brakingTimeReamining >0 ){
+      else if(brakingTimeReamining > 0){
         brakingTimeReamining--;
       }
     }
@@ -481,6 +481,7 @@ void usercontrol(void) {
       //setting motor velocity
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
+      brakingTimeReamining = BRAKING_TIME;
     }
 
     //same as above
@@ -498,6 +499,7 @@ void usercontrol(void) {
     else{
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
+      brakingTimeReamining = BRAKING_TIME;
     }
 
     //Lift: L2 Toggles between Low and target positions
