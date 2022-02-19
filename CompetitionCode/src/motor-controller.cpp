@@ -8,7 +8,6 @@ const double WAIT_TIME = 25; // msec
 void controlMotor(void *arg) {
   MotorController *mc = (MotorController *)arg;
   double tau = mc->getTau();
-  motor *controlledMotor = mc->getControlledMotor();
 
   while (true) {
     double targetVal = mc->getTargetValue();
@@ -25,26 +24,60 @@ void controlMotor(void *arg) {
     }
 
     if(mc->getEnabled()){
-      controlledMotor->setVelocity(speed, percent);
-      controlledMotor->spin(fwd);
+      mc->spinMotors(speed);
     }
     printf("%p %f %f %d \n", arg, targetVal, currentVal, speed);
     wait(WAIT_TIME, msec);
   }
 }
 
-MotorController::MotorController(motor *cm, potV2 *cP, double *tv,
+MotorController::MotorController(motor *cm, pot* cP, double *tv,
                                  double tau) {
 
-  new thread(controlMotor, this);
 
   controlledMotor = cm;
+  controlledMotorGroup = (motor_group*) NULL;
+  controlledPotV2 = NULL;
   controlledPot = cP;
   targetValue = tv;
   this->tau = tau;
   maxSpeedThresh = 1000000;
 
   enabled = false;
+  
+  new thread(controlMotor, this);
+}
+
+MotorController::MotorController(motor *cm, potV2* cPV2, double *tv,
+                                 double tau) {
+
+
+  controlledMotor = cm;
+  controlledMotorGroup = (motor_group*) NULL;
+  controlledPotV2 = cPV2;
+  targetValue = tv;
+  this->tau = tau;
+  maxSpeedThresh = 1000000;
+
+  enabled = false;
+  
+  new thread(controlMotor, this);
+}
+
+MotorController::MotorController(motor_group *cm, potV2 *cPV2, double *tv,
+                                 double tau) {
+
+
+  controlledMotor = NULL;
+  controlledMotorGroup = cm;
+  controlledPotV2 = cPV2;
+  targetValue = tv;
+  this->tau = tau;
+  maxSpeedThresh = 1000000;
+
+  enabled = false;
+  
+  new thread(controlMotor, this);
 }
 
 void MotorController::setEnabled(bool b){
@@ -53,8 +86,27 @@ void MotorController::setEnabled(bool b){
 
 motor *MotorController::getControlledMotor() { return controlledMotor; }
 
+//spins motors if they are a group or individual motoroooooo
+void MotorController::spinMotors(int v){
+  if(controlledMotor != NULL){
+    controlledMotor->setVelocity(v, percent);
+    controlledMotor->spin(fwd);
+  }
+  else{
+    controlledMotorGroup->setVelocity(v, percent);
+    controlledMotorGroup->spin(fwd);
+  }
+}
+
 // returns controlledValue
-double MotorController::getControlledValue() { return controlledPot->angle(degrees); }
+double MotorController::getControlledValue() { 
+    if(controlledPotV2 != NULL){
+      return controlledPotV2->angle(degrees); 
+    }
+    else{
+      return controlledPot->angle(degrees);
+    }
+}
 
 // returns targetValue
 double MotorController::getTargetValue() { return *targetValue; }

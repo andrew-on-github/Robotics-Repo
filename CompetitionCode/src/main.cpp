@@ -18,13 +18,13 @@
 // LeftBackMotor        motor         11              
 // RightFrontMotor      motor         8               
 // RightBackMotor       motor         18              
-// LiftMotor            motor         12              
-// MobileGoalMotor      motor         1               
+// MobileGoalMotor      motor         3               
 // AutoTest             digital_in    H               
-// ClampMotor           motor         3               
+// ClampMotor           motor         17              
 // LiftPot              potV2         A               
 // MobileGoalPot        potV2         B               
 // ClampPot             pot           C               
+// LiftMotor            motor_group   19, 20          
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -61,6 +61,7 @@ int selectedAuto = 0;
 //motor controller objects 
 MotorController* LiftMotorController;
 MotorController* MobileGoalMotorController;
+MotorController* ClampMotorController;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -76,21 +77,24 @@ MotorController* MobileGoalMotorController;
 int clampActuations = 0;
 
 // target angle of the lift
-const double LIFT_HIGH_POSITION = 14;
-const double LIFT_LOW_POSITION = 102;
-const double LIFT_MID_POSITION = 45;
+const double LIFT_HIGH_POSITION = 110;
+const double LIFT_LOW_POSITION = 23;
+
+const double CLAMP_OUT_POSITION = 190;
+const double CLAMP_IN_POSITION = 78;
 
 const double LIFT_TAU = 0.25;
 const double MOBILE_GOAL_TAU = 0.25;
+const double CLAMP_TAU = 2.5;
 
 double liftTarget = LIFT_LOW_POSITION;
-
+double clampTarget = CLAMP_IN_POSITION;
 
 const double EPSILON = 1E-5;
 
 // target angle of the mobile goal
-const double MOBILE_GOAL_EXTENDED = 216;
-const double MOBILE_GOAL_RETRACTED = 132;
+const double MOBILE_GOAL_EXTENDED = 190;
+const double MOBILE_GOAL_RETRACTED = 125;
 double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
 
 //declaring and initializing preauto flag
@@ -110,31 +114,27 @@ void mobileGoalFSA(){
 const double MC_THRESHOLD_LIFT_UP = 10;
 const double MC_THRESHOLD_LIFT_DOWN = 1000000;
 
-//true = right arrow high toggle, false = l2 low toggle
-void liftFSA(bool isHighToggle){
-  if(isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
+void clampFSA(){
+  printf("clamp fsa\n");
+  if(fabs(clampTarget - CLAMP_OUT_POSITION) < EPSILON){
+    clampTarget = CLAMP_IN_POSITION;
+    printf("clamp in\n");
+  }
+  else{
+    clampTarget = CLAMP_OUT_POSITION;
+    printf("clamp out\n");
+  }
+}
+
+//l2
+void liftFSA(){
+  if(fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
     liftTarget = LIFT_HIGH_POSITION;
     LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
   }
-  else if(isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
-    liftTarget = LIFT_MID_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
-  }
-  else if(isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
-    liftTarget = LIFT_HIGH_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
-  }
-  else if(!isHighToggle && fabs(liftTarget - LIFT_MID_POSITION) < EPSILON) {
+  else if(fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
     liftTarget = LIFT_LOW_POSITION;
     LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
-  }
-  else if(!isHighToggle && fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
-    liftTarget = LIFT_LOW_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
-  }
-  else if(!isHighToggle && fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
-    liftTarget = LIFT_MID_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
   }
 }
 
@@ -166,7 +166,7 @@ void controllerScreen(){
   int minutesRemaining;
   int secondsRemaining;
   
-  motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
+  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
 
   int hiMotor = 0;
   int warningTemp = 100; //temperature at which the brain throttles control
@@ -244,7 +244,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("MG ANGLE: %.2f", -MobileGoalMotor.position(degrees));
+      Controller1.Screen.print("CLAMP ANGLE: %.2f", ClampPot.angle(degrees));
     }
 
 
@@ -271,6 +271,7 @@ void pre_auton(void) {
   //initializing motor controllers
   LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
   MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
+  ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
@@ -423,14 +424,13 @@ void usercontrol(void) {
   //allowing motor controllers to control their motors
   LiftMotorController->setEnabled(true);
   MobileGoalMotorController->setEnabled(true);
+  ClampMotorController->setEnabled(true);
 
-  //declaring and initializing clamp variables
-  bool clamp = false;
-  bool clampLast = false;
-
-  //delcaring and initializing mobilegoal macro vars
+  //declaring and initializing last vars
   bool l1Last = false;
-  bool mobileGoalFwd = false;
+  bool r2Last = false;
+  bool l2Last = false;
+  bool rightLast = false;
 
   //default deadzone value 
   //want this to be as low as possible without any drift
@@ -484,24 +484,20 @@ void usercontrol(void) {
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
     }
 
+    //Lift: L2 Toggles between Low and target positions
+    //Right toggles target between the highest value and the target value
+    if(Controller1.ButtonL2.pressing() && !l2Last){
+      liftFSA();
+    }
+
     //Clamp: R2 toggles
-    if(Controller1.ButtonR2.pressing() && !clampLast){
-      clamp = !clamp;
+    if(Controller1.ButtonR2.pressing() && !r2Last){
+      clampFSA();
     }
 
     //Mobile Goal: L1 toggles
     if(Controller1.ButtonL1.pressing() && !l1Last){
-      mobileGoalFwd = !mobileGoalFwd;
-    }
-
-    if(MobileGoalMotor.position(degrees) < -150 && !mobileGoalFwd){
-      MobileGoalMotor.setVelocity(100, percent);
-    }
-    else if(MobileGoalMotor.position(degrees) > -550 && mobileGoalFwd){
-      MobileGoalMotor.setVelocity(-100, percent);
-    }
-    else{
-      MobileGoalMotor.setVelocity(0, percent);
+      mobileGoalFSA();
     }
     
     //spinning motors and activating hydraulics
@@ -510,13 +506,10 @@ void usercontrol(void) {
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
     
-    MobileGoalMotor.spin(fwd);
-
-    
     //update clamplast so inputs arent counted multiple times
-    clampLast = Controller1.ButtonR2.pressing();
-
-    //update l1Last so inputs arent counted mulitple times
+    r2Last = Controller1.ButtonR2.pressing();
+    l2Last = Controller1.ButtonL2.pressing();
+    rightLast = Controller1.ButtonRight.pressing();
     l1Last = Controller1.ButtonL1.pressing();
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
