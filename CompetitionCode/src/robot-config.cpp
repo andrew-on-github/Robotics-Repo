@@ -16,13 +16,15 @@ motor LeftBackMotor = motor(PORT8, ratio18_1, false);
 motor RightFrontMotor = motor(PORT12, ratio18_1, true);
 motor RightBackMotor = motor(PORT7, ratio18_1, true);
 motor IntakeMotor = motor(PORT18, ratio18_1, true);
-motor LiftMotor = motor(PORT17, ratio36_1, true);
 motor MobileGoalMotor = motor(PORT13, ratio18_1, false);
 digital_in AutoTest = digital_in(Brain.ThreeWirePort.C);
 potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.D);
 potV2 LiftPot = potV2(Brain.ThreeWirePort.E);
 potV2 IVAAD = potV2(Brain.ThreeWirePort.H);
 pneumatics ClampPiston = pneumatics(Brain.ThreeWirePort.F);
+motor LiftMotorMotorA = motor(PORT17, ratio36_1, true);
+motor LiftMotorMotorB = motor(PORT14, ratio36_1, false);
+motor_group LiftMotor = motor_group(LiftMotorMotorA, LiftMotorMotorB);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
