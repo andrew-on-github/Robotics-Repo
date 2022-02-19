@@ -76,8 +76,9 @@ MotorController* ClampMotorController;
 //global to count the number of actuations of clamp
 int clampActuations = 0;
 
-//const to decide the amount of time before braking starts
-const int BRAKING_TIME = 10;
+//const to decide the amount of time before braking starts. 1 braking time = 1 usercontrol 
+//loop cycle = .25 msec
+const int BRAKING_TIME = 500;
 
 //var to count amount of time reamining before breaking
 int brakingTimeReamining = BRAKING_TIME;
@@ -85,11 +86,11 @@ int brakingTimeReamining = BRAKING_TIME;
 const double WHEEL_CIRCUMFRENCE = 12.56637;
 
 // target angle of the lift
-const double LIFT_HIGH_POSITION = 110;
-const double LIFT_LOW_POSITION = 23;
+const double LIFT_HIGH_POSITION = 120;
+const double LIFT_LOW_POSITION = 27;
 
-const double CLAMP_OUT_POSITION = 190;
-const double CLAMP_IN_POSITION = 78;
+const double CLAMP_OUT_POSITION = 187;
+const double CLAMP_IN_POSITION = 80;
 
 const double LIFT_TAU = 0.25;
 const double MOBILE_GOAL_TAU = 0.25;
@@ -252,7 +253,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("CLAMP ANGLE: %.2f", ClampPot.angle(degrees));
+      Controller1.Screen.print("LIFT ANGLE: %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -386,11 +387,11 @@ void autonomous(void) {
   while(true){
     switch(selectedAuto){
       case 0:
-        //wheel circumfrence = 6", each revolution moves robot 6"
+        //wheel circumfrence = 12.56637", divide travel distance in inches by wheel circumfrence constatn"
         mobileGoalTarget = MOBILE_GOAL_EXTENDED;
-        DriveMotorGroup.spinFor(fwd, 2.5 / WHEEL_CIRCUMFRENCE, rev);
+        DriveMotorGroup.spinFor(fwd, 30 / WHEEL_CIRCUMFRENCE, rev);
         mobileGoalTarget = MOBILE_GOAL_RETRACTED;
-        DriveMotorGroup.spinFor(reverse, 2.5 / WHEEL_CIRCUMFRENCE, rev);
+        DriveMotorGroup.spinFor(reverse, 30 / WHEEL_CIRCUMFRENCE, rev);
         break;
       
       case 1:
