@@ -130,14 +130,14 @@ void liftFSA(bool isHighToggle){
   }
 }
 
-void lowerLift(){
+/*void lowerLift(){
   LiftMotor.setVelocity(-100, percent);
   LiftMotor.spin(fwd);
   while(LiftPot.angle(degrees) > 45 ){
     wait(25, msec);
   }
   LiftMotor.stop();
-}
+}*/
 
 int controllerCurve(int input, double curve){
   
@@ -402,30 +402,28 @@ void autonomous(void) {
         Controller1.Screen.print("AUTO 0");
 
         // turn off hold
-        stopAllMotors();
+        DriveMotorGroup.stop();
         wait(100, msec); // .1 s
 
         // lower lift
-        MobileGoalMotor.setVelocity(-100,percent);
-        MobileGoalMotor.spin(fwd);
+        mobileGoalFSA();
         wait(800, msec); // .6 s
-        MobileGoalMotor.stop();
-        wait(250, msec); // .85 s
+       
 
         // drive forward to first goalpost
-        setVelocityAllMotors(80);
-        setDirectionAllMotors(reverse);
-        wait(600, msec); // 1.45 s
-        setVelocityAllMotors(0);
-        stopAllMotors();
+        DriveMotorGroup.setVelocity(100, percent);
+        DriveMotorGroup.spin(reverse);
+        liftFSA(true);
+        wait(400, msec); // 1.45 s
+        DriveMotorGroup.setVelocity(0, percent);
+        DriveMotorGroup.stop();
         wait(100, msec); // 1.55 s
 
         // lift goalpost
-        MobileGoalMotor.setVelocity(-100,percent);
-        MobileGoalMotor.spin(reverse);
+        mobileGoalFSA();
         wait(1200,msec); // 2.75 s
-        MobileGoalMotor.stop();
-        wait(100,msec); // 2.85 s
+        //MobileGoalMotor.stop();
+        //wait(100,msec); // 2.85 s
 
 
         /*setVelocityAllMotors(100);
@@ -445,14 +443,14 @@ void autonomous(void) {
         IntakeMotor.spin(fwd);
         wait(3000,msec); // 5.85 s
         IntakeMotor.stop();
-        setVelocityAllMotors(50);
-        setDirectionAllMotors(reverse);
+        DriveMotorGroup.setVelocity(50, percent);
+        DriveMotorGroup.spin(reverse);
         IntakeMotor.setVelocity(100,percent);
         IntakeMotor.spin(fwd);
         wait(100,msec);
         IntakeMotor.stop();
-        setVelocityAllMotors(50);
-        setDirectionAllMotors(fwd);
+        DriveMotorGroup.setVelocity(50,percent);
+        DriveMotorGroup.spin(fwd);
         IntakeMotor.setVelocity(100,percent);
         IntakeMotor.spin(fwd);
         wait(100,msec);
@@ -471,25 +469,16 @@ void autonomous(void) {
 
         // put goalpost down
         wait(100,msec);
-        LeftBackMotor.stop(hold);
-        LeftFrontMotor.stop(hold);
-        RightBackMotor.stop(hold);
-        RightFrontMotor.stop(hold);
-        MobileGoalMotor.setVelocity(-70,percent);
-        MobileGoalMotor.spin(fwd);
+        DriveMotorGroup.stop(hold);
+        mobileGoalFSA();
         wait(800, msec);
-        MobileGoalMotor.stop();
-        LeftBackMotor.stop(coast);
-        LeftFrontMotor.stop(coast);
-        RightBackMotor.stop(coast);
-        RightFrontMotor.stop(coast);
-        wait(500, msec);
 
         // back up
-        setVelocityAllMotors(-50);
-        setDirectionAllMotors(reverse);
+        liftFSA(false);
+        DriveMotorGroup.setVelocity(-50,percent);
+        DriveMotorGroup.spin(reverse);
         wait(800,msec);
-        stopAllMotors();
+        DriveMotorGroup.stop();
 
         
         break;
