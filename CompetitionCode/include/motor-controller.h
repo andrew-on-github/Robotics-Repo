@@ -6,7 +6,9 @@
 
 class MotorController {
     motor* controlledMotor;
-    potV2* controlledPot; 
+    motor_group* controlledMotorGroup;
+    pot* controlledPot;
+    potV2* controlledPotV2; 
     double* targetValue;
     double tau;
     bool enabled;
@@ -15,8 +17,13 @@ class MotorController {
     double maxSpeedThresh;
 
   public:
-    MotorController(motor* cm, potV2* cP, double* tv, double tau);
+    MotorController(motor* cm, pot* cP, double* tv, double tau);
+    MotorController(motor* cm, potV2* cPV2, double* tv, double tau);
+    MotorController(motor_group* cm, potV2* cPV2, double* tv, double tau);
+
     
+    void spinMotors(int v);
+
     //accessors
     //returns pointer to motor
     motor* getControlledMotor();

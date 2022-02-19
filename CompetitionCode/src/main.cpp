@@ -383,8 +383,6 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  
-  printf("autonomous starting.\n");
 
   //updating flag to cause preauton method to exit
   preauto = false;
@@ -610,10 +608,10 @@ void usercontrol(void) {
     }
 
     //Intake: R1 Fwd Y rev
-    if(Controller1.ButtonR1.pressing()){
+    if(Controller1.ButtonR1.pressing() && fabs(liftTarget - LIFT_LOW_POSITION) > EPSILON){
       IntakeMotor.setVelocity(100, percent);
     }
-    else if(Controller1.ButtonY.pressing()){
+    else if(Controller1.ButtonY.pressing() && fabs(liftTarget - LIFT_LOW_POSITION) > EPSILON){
       IntakeMotor.setVelocity(-100, percent);
     }
     else{
