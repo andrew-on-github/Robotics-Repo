@@ -384,7 +384,9 @@ void autonomous(void) {
   while(true){
     switch(selectedAuto){
       case 0:
-        Brain.Screen.print("0");
+        mobileGoalTarget = MOBILE_GOAL_EXTENDED;
+        DriveMotorGroup.spinFor(fwd, 0.5, rev);
+        mobileGoalTarget = MOBILE_GOAL_RETRACTED;
         break;
       
       case 1:
