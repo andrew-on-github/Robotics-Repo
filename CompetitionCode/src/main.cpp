@@ -76,6 +76,12 @@ MotorController* ClampMotorController;
 //global to count the number of actuations of clamp
 int clampActuations = 0;
 
+//const to decide the amount of time before braking starts
+const int BRAKING_TIME = 10;
+
+//var to count amount of time reamining before breaking
+int brakingTimeReamining = BRAKING_TIME;
+
 // target angle of the lift
 const double LIFT_HIGH_POSITION = 110;
 const double LIFT_LOW_POSITION = 23;
@@ -463,8 +469,13 @@ void usercontrol(void) {
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
       //sets motors to brake mode
-      LeftBackMotor.stop(hold);
-      LeftFrontMotor.stop(hold);
+      if(brakingTimeReamining <= 0){
+        LeftBackMotor.stop(hold);
+        LeftFrontMotor.stop(hold);
+      }
+      else if(brakingTimeReamining >0 ){
+        brakingTimeReamining--;
+      }
     }
     else{
       //setting motor velocity
@@ -476,8 +487,13 @@ void usercontrol(void) {
     if(abs(rightMotorSpeed) < deadzone) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
-      RightBackMotor.stop(hold);
-      RightFrontMotor.stop(hold);
+      if(brakingTimeReamining <= 0){
+        RightBackMotor.stop(hold);
+        RightFrontMotor.stop(hold);
+      }
+      else if(brakingTimeReamining >0 ){
+        brakingTimeReamining--;
+      }
     }
     else{
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
@@ -511,6 +527,8 @@ void usercontrol(void) {
     l2Last = Controller1.ButtonL2.pressing();
     rightLast = Controller1.ButtonRight.pressing();
     l1Last = Controller1.ButtonL1.pressing();
+
+    //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
