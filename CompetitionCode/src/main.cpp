@@ -82,6 +82,8 @@ const int BRAKING_TIME = 10;
 //var to count amount of time reamining before breaking
 int brakingTimeReamining = BRAKING_TIME;
 
+const double WHEEL_CIRCUMFRENCE = 12.56637;
+
 // target angle of the lift
 const double LIFT_HIGH_POSITION = 110;
 const double LIFT_LOW_POSITION = 23;
@@ -384,9 +386,11 @@ void autonomous(void) {
   while(true){
     switch(selectedAuto){
       case 0:
+        //wheel circumfrence = 6", each revolution moves robot 6"
         mobileGoalTarget = MOBILE_GOAL_EXTENDED;
-        DriveMotorGroup.spinFor(fwd, 0.5, rev);
+        DriveMotorGroup.spinFor(fwd, 2.5 / WHEEL_CIRCUMFRENCE, rev);
         mobileGoalTarget = MOBILE_GOAL_RETRACTED;
+        DriveMotorGroup.spinFor(reverse, 2.5 / WHEEL_CIRCUMFRENCE, rev);
         break;
       
       case 1:
