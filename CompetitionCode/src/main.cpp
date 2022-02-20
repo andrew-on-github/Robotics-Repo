@@ -85,6 +85,9 @@ int brakingTimeReamining = BRAKING_TIME;
 
 const double WHEEL_CIRCUMFRENCE = 12.56637;
 
+//amount of time in teh user control portion of the match in seconds
+const int USERCONTROL_TIME_SECONDS = 105;
+
 // target angle of the lift
 const double LIFT_HIGH_POSITION = 120;
 const double LIFT_LOW_POSITION = 27;
@@ -124,14 +127,11 @@ const double MC_THRESHOLD_LIFT_UP = 10;
 const double MC_THRESHOLD_LIFT_DOWN = 1000000;
 
 void clampFSA(){
-  printf("clamp fsa\n");
   if(fabs(clampTarget - CLAMP_OUT_POSITION) < EPSILON){
     clampTarget = CLAMP_IN_POSITION;
-    printf("clamp in\n");
   }
   else{
     clampTarget = CLAMP_OUT_POSITION;
-    printf("clamp out\n");
   }
 }
 
@@ -175,7 +175,7 @@ void controllerScreen(){
   int minutesRemaining;
   int secondsRemaining;
   
-  motor motors[4] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor};
+  motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
 
   int hiMotor = 0;
   int warningTemp = 100; //temperature at which the brain throttles control
@@ -186,7 +186,7 @@ void controllerScreen(){
     //timer calculations
 
     //subtracting seconds since brain timer reset from 105 (user control time in seconds)
-    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
+    totalSecondsRemaining = USERCONTROL_TIME_SECONDS - ((int) Brain.Timer.time(seconds));
 
     //splitting into minutes and seconds remaining for display
     if(totalSecondsRemaining > 0){
@@ -199,12 +199,12 @@ void controllerScreen(){
     }
 
     //calculating average temp of the 4 motors
-    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
+    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / sizeof(motors); 
 
     //calculating highest motor temp
     for(int i = 0; i<5; i++){
-      if(motors[i].temperature(percent) >= hiTemp){
-        hiTemp = motors[i].temperature(percent);
+      if(motors[i]->temperature(percent) >= hiTemp){
+        hiTemp = motors[i]->temperature(percent);
         hiMotor = i;
       }
     }
@@ -239,7 +239,7 @@ void controllerScreen(){
         Controller1.Screen.print("MG");
       }
       Controller1.Screen.print(" WARN\n");
-      Controller1.Screen.print(motors[hiMotor].temperature(percent));
+      Controller1.Screen.print(motors[hiMotor]->temperature(percent));
     }
     else{
       //make sure that the correct number of digits is printed for seconds
