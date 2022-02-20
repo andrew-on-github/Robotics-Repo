@@ -45,6 +45,8 @@ motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
 
 motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
 
+motor_group LiftMotor(LeftLiftMotor, RightLiftMotor);
+
 //motor controller objects 
 MotorController* LiftMotorController;
 MotorController* MobileGoalMotorController;
@@ -67,7 +69,10 @@ int selectedAuto = 0;
 //global to count the number of actuations of clamp
 int clampActuations = 0;
 
-// target angle of the lift
+//time of user control period in seconds
+int USERCONTROL_TIME_SECONDS = 105;
+
+// target angles of the lift
 const double LIFT_HIGH_POSITION = 14;
 const double LIFT_LOW_POSITION = 102;
 const double LIFT_MID_POSITION = 45;
@@ -77,10 +82,9 @@ const double MOBILE_GOAL_TAU = 0.25;
 
 double liftTarget = LIFT_LOW_POSITION;
 
-
 const double EPSILON = 1E-5;
 
-// target angle of the mobile goal
+// target angles of the mobile goal
 const double MOBILE_GOAL_EXTENDED = 216;
 const double MOBILE_GOAL_RETRACTED = 132;
 double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
@@ -130,15 +134,6 @@ void liftFSA(bool isHighToggle){
   }
 }
 
-/*void lowerLift(){
-  LiftMotor.setVelocity(-100, percent);
-  LiftMotor.spin(fwd);
-  while(LiftPot.angle(degrees) > 45 ){
-    wait(25, msec);
-  }
-  LiftMotor.stop();
-}*/
-
 int controllerCurve(int input, double curve){
   
   double dubInput = input;
@@ -156,22 +151,23 @@ int controllerCurve(int input, double curve){
 
 }
 
-
 void controllerScreen(){
 
   //declaring and initializing variables for temp control
   double avgTemp = 0;
   double hiTemp = 0;
-
+  
   //delcaring and variables for timer
   int totalSecondsRemaining;
   int minutesRemaining;
   int secondsRemaining;
   
-  motor motors[5] = {LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor, MobileGoalMotor};
+  //be sure to adjust when motors are added/removed
+  motor* motors[8] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor,
+                      &RightLiftMotor, &MobileGoalMotor, &IntakeMotor};
 
-  int hiMotor = 0;
-  int warningTemp = 100; //temperature at which the brain throttles control
+  motor* hiMotor = 0;
+  const int WARNING_TEMP = 100; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
 
@@ -179,58 +175,74 @@ void controllerScreen(){
     //timer calculations
 
     //subtracting seconds since brain timer reset from 105 (user control time in seconds)
-    totalSecondsRemaining = 105 - ((int) Brain.Timer.time(seconds));
-    if(totalSecondsRemaining < 0){
-      totalSecondsRemaining = 0;
-    } 
+    totalSecondsRemaining = USERCONTROL_TIME_SECONDS - ((int) Brain.Timer.time(seconds));
 
     //splitting into minutes and seconds remaining for display
-    minutesRemaining = (totalSecondsRemaining / 60);
-    secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    if(totalSecondsRemaining > 0){
+      minutesRemaining = (totalSecondsRemaining / 60);
+      secondsRemaining = (totalSecondsRemaining - (minutesRemaining * 60));
+    }
+    else{
+      minutesRemaining = 0;
+      secondsRemaining = 0;
+    }
 
     //calculating average temp of the 4 motors
-    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / 4; 
+    int motorsSize = 0;
+    int total = 0;
+    for(motor* currentMotor : motors){
+      total += currentMotor->temperature(percent);
+      motorsSize++;
+    }
+
+    avgTemp = total / motorsSize;
 
     //calculating highest motor temp
-    for(int i = 0; i<5; i++){
-      if(motors[i].temperature(percent) >= hiTemp){
-        hiTemp = motors[i].temperature(percent);
-        hiMotor = i;
+    for(motor* currentMotor : motors){
+      if(currentMotor->temperature(percent) >= hiTemp){
+        hiTemp = currentMotor->temperature(percent);
+        hiMotor = currentMotor;
       }
     }
 
 
 
     //controller screen print commands
-    //time takes precedence, followed by temp warning, follwoed by everything else
+    //time takes precedence, followed by temp warning, followed by everything else
     Controller1.Screen.setCursor(0, 0);
 
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
       Controller1.Screen.print("TIME WARN");
     }
-    else if(hiTemp > warningTemp){
+    else if(hiTemp > WARNING_TEMP){
       //rumbling controller if motor temps go above threshold
       Controller1.rumble(rumblePulse);
-        //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-      if (hiMotor == 0) {
+      //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
+      if (hiMotor == motors[0]) {
         Controller1.Screen.print("LF");
       }
-      else if(hiMotor == 1){
+      else if(hiMotor == motors[1]){
         Controller1.Screen.print("LB");
       }
-      else if(hiMotor == 2){
+      else if(hiMotor == motors[2]){
         Controller1.Screen.print("RF");
       }
-      else if(hiMotor == 3){
+      else if(hiMotor == motors[3]){
         Controller1.Screen.print("RB");
       }
-      else if(hiMotor == 4){
+      else if(hiMotor == motors[4] || hiMotor == motors[5]){
+        Controller1.Screen.print("LM");
+      }
+      else if(hiMotor == motors[6]){
         Controller1.Screen.print("MG");
+      }
+      else if(hiMotor == motors[7]){
+        Controller1.Screen.print("IM");
       }
       Controller1.Screen.print(" WARN");
       Controller1.Screen.newLine();
-      Controller1.Screen.print(motors[hiMotor].temperature(percent));
+      Controller1.Screen.print("%f °C", hiMotor->temperature(celsius));
     }
     else{
       //make sure that the correct number of digits is printed for seconds
@@ -246,8 +258,6 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("LIFT ANGLE: %.2f", LiftPot.angle(degrees));
     }
-
-
 
     //waiting to avoid making the lcd look weird, or taking up all that sweet sweet cpu time
     //decrease value if you need the ui to update faster, quarter second should be fine

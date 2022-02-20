@@ -22,9 +22,8 @@ potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.D);
 potV2 LiftPot = potV2(Brain.ThreeWirePort.E);
 potV2 IVAAD = potV2(Brain.ThreeWirePort.H);
 pneumatics ClampPiston = pneumatics(Brain.ThreeWirePort.F);
-motor LiftMotorMotorA = motor(PORT17, ratio36_1, true);
-motor LiftMotorMotorB = motor(PORT14, ratio36_1, false);
-motor_group LiftMotor = motor_group(LiftMotorMotorA, LiftMotorMotorB);
+motor RightLiftMotor = motor(PORT17, ratio36_1, true);
+motor LeftLiftMotor = motor(PORT14, ratio36_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
