@@ -26,7 +26,6 @@ void controlMotor(void *arg) {
     if(mc->getEnabled()){
       mc->spinMotors(speed);
     }
-    printf("%p %f %f %d \n", arg, targetVal, currentVal, speed);
     wait(WAIT_TIME, msec);
   }
 }

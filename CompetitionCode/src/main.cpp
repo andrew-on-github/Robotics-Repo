@@ -287,8 +287,15 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
+  //set brain to user double buffered input
+  Brain.Screen.render();
+  
   //initializing selected auto to 0
   selectedAuto = 0;
+
+  //declaring and initializing last cycle variables
+  bool menuSelectLast = false;
+  bool menuCycleLast = false;
 
   //true when autonomous is "locked in" false when still selecting
   bool selected = false;
@@ -300,9 +307,8 @@ void pre_auton(void) {
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
-
     //if menucycle is pressed and auton is not locked in
-    if(MenuCycle.pressing() && !selected){
+    if((MenuCycle.pressing() && !menuCycleLast) && !selected){
       //increment auton, rollover to 0
       if(selectedAuto > 2){
         selectedAuto = 0;
@@ -311,7 +317,7 @@ void pre_auton(void) {
         selectedAuto++;
       }
     }
-    if(MenuSelect.pressing()){
+    if(MenuSelect.pressing() && !menuSelectLast){
       selected = !selected;
     }
 
@@ -370,10 +376,14 @@ void pre_auton(void) {
     //all hail king boolean
 
     //wait statement
-    wait(300, msec);
+    wait(25, msec);
 
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
+
+    //setting last cycle variables
+    menuCycleLast = MenuCycle.pressing();
+    menuSelectLast = MenuSelect.pressing();
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
