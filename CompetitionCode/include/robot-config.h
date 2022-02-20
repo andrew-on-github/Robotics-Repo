@@ -16,7 +16,8 @@ extern motor ClampMotor;
 extern potV2 LiftPot;
 extern potV2 MobileGoalPot;
 extern pot ClampPot;
-extern motor_group LiftMotor;
+extern motor LeftLiftMotor;
+extern motor RightLiftMotor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

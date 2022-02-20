@@ -21,9 +21,8 @@ motor ClampMotor = motor(PORT17, ratio18_1, true);
 potV2 LiftPot = potV2(Brain.ThreeWirePort.A);
 potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.B);
 pot ClampPot = pot(Brain.ThreeWirePort.C);
-motor LiftMotorMotorA = motor(PORT19, ratio36_1, true);
-motor LiftMotorMotorB = motor(PORT20, ratio36_1, false);
-motor_group LiftMotor = motor_group(LiftMotorMotorA, LiftMotorMotorB);
+motor LeftLiftMotor = motor(PORT19, ratio36_1, false);
+motor RightLiftMotor = motor(PORT20, ratio36_1, true);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

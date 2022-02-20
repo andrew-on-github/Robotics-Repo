@@ -24,7 +24,8 @@
 // LiftPot              potV2         A               
 // MobileGoalPot        potV2         B               
 // ClampPot             pot           C               
-// LiftMotor            motor_group   19, 20          
+// LeftLiftMotor        motor         19              
+// RightLiftMotor       motor         20              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -112,6 +113,9 @@ double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
 //declaring and initializing preauto flag
 bool preauto = true;
 
+//declaring and initializing liftmotor group
+motor_group LiftMotor = motor_group(LeftLiftMotor, RightLiftMotor);
+
 void mobileGoalFSA(){
  if(fabs(mobileGoalTarget - MOBILE_GOAL_EXTENDED) < EPSILON) {
    mobileGoalTarget = MOBILE_GOAL_RETRACTED;
@@ -175,10 +179,11 @@ void controllerScreen(){
   int minutesRemaining;
   int secondsRemaining;
   
-  motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
+  //be sure to adjust
+  motor* motors[7] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor, &MobileGoalMotor};
 
-  int hiMotor = 0;
-  int warningTemp = 100; //temperature at which the brain throttles control
+  motor* hiMotor = 0;
+  const int WARNING_TEMP = 100; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
 
@@ -199,47 +204,58 @@ void controllerScreen(){
     }
 
     //calculating average temp of the 4 motors
-    avgTemp = (LeftBackMotor.temperature(percent) + LeftFrontMotor.temperature(percent) + RightBackMotor.temperature(percent) + RightFrontMotor.temperature(percent)) / sizeof(motors); 
+    int motorsSize = 0;
+    int total = 0;
+    for(motor* currentMotor : motors){
+      total += currentMotor->temperature(percent);
+      motorsSize++;
+    }
+
+    avgTemp = total / motorsSize;
 
     //calculating highest motor temp
-    for(int i = 0; i<5; i++){
-      if(motors[i]->temperature(percent) >= hiTemp){
-        hiTemp = motors[i]->temperature(percent);
-        hiMotor = i;
+    for(motor* currentMotor : motors){
+      if(currentMotor->temperature(percent) >= hiTemp){
+        hiTemp = currentMotor->temperature(percent);
+        hiMotor = currentMotor;
       }
     }
 
 
 
     //controller screen print commands
-    //time takes precedence, followed by temp warning, follwoed by everything else
+    //time takes precedence, followed by temp warning, followed by everything else
     Controller1.Screen.setCursor(0, 0);
 
     if(totalSecondsRemaining == 15){
       Controller1.rumble(rumbleShort);
       Controller1.Screen.print("TIME WARN");
     }
-    else if(hiTemp > warningTemp){
+    else if(hiTemp > WARNING_TEMP){
       //rumbling controller if motor temps go above threshold
       Controller1.rumble(rumblePulse);
       //i'm aware that this is absolutely disgusting but theres a quirk in the vexcode api that makes it necessary :(
-      if (hiMotor == 0) {
+      if (hiMotor == motors[0]) {
         Controller1.Screen.print("LF");
       }
-      else if(hiMotor == 1){
+      else if(hiMotor == motors[1]){
         Controller1.Screen.print("LB");
       }
-      else if(hiMotor == 2){
+      else if(hiMotor == motors[2]){
         Controller1.Screen.print("RF");
       }
-      else if(hiMotor == 3){
+      else if(hiMotor == motors[3]){
         Controller1.Screen.print("RB");
       }
-      else if(hiMotor == 4){
+      else if(hiMotor == motors[4] || hiMotor == motors[5]){
+        Controller1.Screen.print("LM");
+      }
+      else if(hiMotor == motors[6]){
         Controller1.Screen.print("MG");
       }
-      Controller1.Screen.print(" WARN\n");
-      Controller1.Screen.print(motors[hiMotor]->temperature(percent));
+      Controller1.Screen.print(" WARN");
+      Controller1.Screen.newLine();
+      Controller1.Screen.print("%f °C", hiMotor->temperature(celsius));
     }
     else{
       //make sure that the correct number of digits is printed for seconds
