@@ -11,6 +11,9 @@ class PositionMonitor {
   public:
     PositionMonitor(inertial* tA, double dT, timeUnits u);
     void trackPosition();
+
+    double getYPos();
+    double getXPos();
 };
 
 #endif // POSITION_H
