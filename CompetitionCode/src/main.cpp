@@ -66,7 +66,7 @@ MotorController* LiftMotorController;
 MotorController* MobileGoalMotorController;
 MotorController* ClampMotorController;
 
-PositionMonitor* PositionMonitor;
+PositionMonitor* RobotPosition;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -88,7 +88,11 @@ const int BRAKING_TIME = 500;
 //var to count amount of time reamining before breaking
 int brakingTimeReamining = BRAKING_TIME;
 
+//wheel circumfrence const
 const double WHEEL_CIRCUMFRENCE = 12.56637;
+
+//delta time constant
+const double DELTA_TIME = 10;
 
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
@@ -308,6 +312,9 @@ void pre_auton(void) {
   LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
   MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
   ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
+
+  //intializing position monitors
+  RobotPosition = new PositionMonitor(&InertialSensor, DELTA_TIME, msec); 
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
@@ -569,10 +576,10 @@ void usercontrol(void) {
     }
     
     //spinning motors and activating hydraulics
-    LeftBackMotor.spin(fwd);
-    LeftFrontMotor.spin(fwd);
-    RightBackMotor.spin(fwd);
-    RightFrontMotor.spin(fwd);
+    //LeftBackMotor.spin(fwd);
+    //LeftFrontMotor.spin(fwd);
+    //RightBackMotor.spin(fwd);
+    //RightFrontMotor.spin(fwd);
     
     //update clamplast so inputs arent counted multiple times
     r2Last = Controller1.ButtonR2.pressing();

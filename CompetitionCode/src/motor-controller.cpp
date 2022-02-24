@@ -24,7 +24,7 @@ void controlMotor(void *arg) {
     }
 
     if(mc->getEnabled()){
-      mc->spinMotors(speed);
+      //mc->spinMotors(speed);
     }
     wait(WAIT_TIME, msec);
   }

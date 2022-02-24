@@ -50,6 +50,9 @@ void PositionMonitor::trackPosition(){
     prevXAccel = xAccel;
     prevYAccel = yAccel;
 
+    printf("X Acceleration: %f Velocity: %f Position: %f", xAccel, xVelocity, xPos);
+    printf("Y Acceleration: %f Velocity: %f Position: %f", yAccel, yVelocity, yPos);
+
     wait(deltaTime, units); 
   }
 
