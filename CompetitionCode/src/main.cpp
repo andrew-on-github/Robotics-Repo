@@ -26,11 +26,13 @@
 // ClampPot             pot           C               
 // LeftLiftMotor        motor         19              
 // RightLiftMotor       motor         20              
+// InertialSensor       inertial      15              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
 
 #include "motor-controller.h"
+#include "position.h"
 
 using namespace vex;
 using namespace std;
@@ -63,6 +65,8 @@ int selectedAuto = 0;
 MotorController* LiftMotorController;
 MotorController* MobileGoalMotorController;
 MotorController* ClampMotorController;
+
+PositionMonitor* PositionMonitor;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -462,6 +466,10 @@ void autonomous(void) {
 void usercontrol(void) {
 
   new thread(controllerScreen);
+
+
+
+  
 
   //updating flag to cause preauton method to exit
   preauto = false;

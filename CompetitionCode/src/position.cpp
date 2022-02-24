@@ -9,10 +9,15 @@ const double G_IN_MPSPS = 9.80665;
 
 double xVelocity = 0;
 double yVelocity = 0;
+
 double xPos = 0;
 double yPos = 0;
+
 double xAccel = 0;
 double yAccel = 0;
+
+double prevXAccel = 0;
+double prevYAccel = 0;
 
 PositionMonitor::PositionMonitor(inertial* tA, double dT, timeUnits u){
   trackedAccel = tA;
@@ -36,11 +41,15 @@ void PositionMonitor::trackPosition(){
     xAccel = trackedAccel->acceleration(xaxis) / G_IN_MPSPS;
     yAccel = trackedAccel->acceleration(yaxis) / G_IN_MPSPS;
 
-    xVelocity = xVelocity * deltaTime + (xAccel / 2) * pow(deltaTime, 2);
-    yVelocity = yVelocity * deltaTime + (xAccel / 2) * pow(deltaTime, 2);
+    xPos += (xVelocity * deltaTime) + (1/3) * prevXAccel * pow(deltaTime, 2) + (1/6) * xAccel * pow(deltaTime, 2);
+    yPos += (yVelocity * deltaTime) + (1/3) * prevYAccel * pow(deltaTime, 2) + (1/6) * yAccel * pow(deltaTime, 2);   
 
-    xPos += xVelocity;
-    yPos += yVelocity;
+    xVelocity = (xAccel + prevXAccel) / 2 * deltaTime;
+    yVelocity = (yAccel + prevYAccel) / 2 * deltaTime; 
+
+    prevXAccel = xAccel;
+    prevYAccel = yAccel;
+
     wait(deltaTime, units); 
   }
 

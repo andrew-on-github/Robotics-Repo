@@ -18,6 +18,7 @@ extern potV2 MobileGoalPot;
 extern pot ClampPot;
 extern motor LeftLiftMotor;
 extern motor RightLiftMotor;
+extern inertial InertialSensor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

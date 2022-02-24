@@ -23,6 +23,7 @@ potV2 MobileGoalPot = potV2(Brain.ThreeWirePort.B);
 pot ClampPot = pot(Brain.ThreeWirePort.C);
 motor LeftLiftMotor = motor(PORT19, ratio36_1, false);
 motor RightLiftMotor = motor(PORT20, ratio36_1, true);
+inertial InertialSensor = inertial(PORT15);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
