@@ -19,20 +19,6 @@ double yAccel = 0;
 double prevXAccel = 0;
 double prevYAccel = 0;
 
-PositionMonitor::PositionMonitor(inertial* tA, double dT, timeUnits u){
-  trackedAccel = tA;
-  deltaTime = dT;
-  units = u;
-}
-
-double PositionMonitor::getXPos(){
-  return xPos;
-}
-
-double PositionMonitor::getYPos(){
-  return yPos;
-}
-
 void PositionMonitor::trackPosition(){
 
 
@@ -55,5 +41,21 @@ void PositionMonitor::trackPosition(){
 
     wait(deltaTime, units); 
   }
-
 }
+
+PositionMonitor::PositionMonitor(inertial* tA, double dT, timeUnits u){
+  trackedAccel = tA;
+  deltaTime = dT;
+  units = u;
+
+  new thread();
+}
+
+double PositionMonitor::getXPos(){
+  return xPos;
+}
+
+double PositionMonitor::getYPos(){
+  return yPos;
+}
+

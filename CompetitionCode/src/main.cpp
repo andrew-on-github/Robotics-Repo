@@ -277,7 +277,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("LIFT ANGLE: %.2f", LiftPot.angle(degrees));
+      Controller1.Screen.print("X POS: %.2f", RobotPosition->getXPos());
     }
 
 
