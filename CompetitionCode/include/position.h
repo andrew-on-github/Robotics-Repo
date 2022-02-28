@@ -8,6 +8,18 @@ class PositionMonitor {
   double deltaTime;
   timeUnits units;
 
+  double xVelocity;
+  double yVelocity;
+
+  double xPos;
+  double yPos;
+
+  double xAccel;
+  double yAccel;
+
+  double prevXAccel;
+  double prevYAccel;
+
   public:
     PositionMonitor(inertial* tA, double dT, timeUnits u);
     void trackPosition();
