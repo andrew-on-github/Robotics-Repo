@@ -32,6 +32,7 @@
 #include "vex.h"
 
 #include "motor-controller.h"
+#include "position.h"
 
 using namespace vex;
 using namespace std;
@@ -50,6 +51,8 @@ motor_group LiftMotor(LeftLiftMotor, RightLiftMotor);
 //motor controller objects 
 MotorController* LiftMotorController;
 MotorController* MobileGoalMotorController;
+
+PositionMonitor* RobotPosition;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -76,6 +79,8 @@ int USERCONTROL_TIME_SECONDS = 105;
 const double LIFT_HIGH_POSITION = 14;
 const double LIFT_LOW_POSITION = 102;
 const double LIFT_MID_POSITION = 45;
+
+const double DELTA_TIME = 10;
 
 const double LIFT_TAU = 0.25;
 const double MOBILE_GOAL_TAU = 0.25;
@@ -288,6 +293,9 @@ void pre_auton(void) {
   //initializing motor controllers
   LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
   MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
+
+  //initializing position monitor
+  RobotPosition = new PositionMonitor(&InertialSensor, DELTA_TIME, msec);
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){

@@ -24,6 +24,7 @@ potV2 IVAAD = potV2(Brain.ThreeWirePort.H);
 pneumatics ClampPiston = pneumatics(Brain.ThreeWirePort.F);
 motor RightLiftMotor = motor(PORT17, ratio36_1, true);
 motor LeftLiftMotor = motor(PORT14, ratio36_1, false);
+inertial InertialSensor = inertial(PORT20);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

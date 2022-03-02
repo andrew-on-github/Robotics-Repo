@@ -19,6 +19,7 @@ extern potV2 MobileGoalPot;
 extern potV2 LiftPot;
 extern potV2 IVAAD;
 extern pneumatics ClampPiston;
+extern inertial InertialSensor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
