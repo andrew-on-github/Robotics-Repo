@@ -90,11 +90,11 @@ motor *MotorController::getControlledMotor() { return controlledMotor; }
 void MotorController::spinMotors(int v){
   if(controlledMotor != NULL){
     controlledMotor->setVelocity(v, percent);
-    controlledMotor->spin(fwd);
+    //controlledMotor->spin(fwd);
   }
   else{
     controlledMotorGroup->setVelocity(v, percent);
-    controlledMotorGroup->spin(fwd);
+    //controlledMotorGroup->spin(fwd);
   }
 }
 
