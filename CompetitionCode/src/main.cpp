@@ -294,9 +294,6 @@ void controllerScreen(){
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-
-  //set brain to user double buffered input
-  Brain.Screen.render();
   
   //initializing selected auto to 0
   selectedAuto = 0;
@@ -313,15 +310,18 @@ void pre_auton(void) {
   MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
   ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
 
-  //intializing position monitors
-  RobotPosition = new PositionMonitor(&InertialSensor, DELTA_TIME, msec); 
+  //initializing position monitor
+  RobotPosition = new PositionMonitor(&InertialSensor, DELTA_TIME, msec);
+
+  //double buffering
+  Brain.Screen.render(true, false);
 
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
     //if menucycle is pressed and auton is not locked in
     if((MenuCycle.pressing() && !menuCycleLast) && !selected){
       //increment auton, rollover to 0
-      if(selectedAuto > 2){
+      if(selectedAuto >= 3){
         selectedAuto = 0;
       }
       else{
@@ -386,20 +386,23 @@ void pre_auton(void) {
     }
     //all hail king boolean
 
+    //setting last cycle variables
+    menuCycleLast = MenuCycle.pressing();
+    menuSelectLast = MenuSelect.pressing();
+    
+    Brain.Screen.render();
+    
     //wait statement
-    wait(25, msec);
+    wait(5, msec);
+
 
     //clearing screen to make room for next cycle
     Brain.Screen.clearScreen();
 
-    //setting last cycle variables
-    menuCycleLast = MenuCycle.pressing();
-    menuSelectLast = MenuSelect.pressing();
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
