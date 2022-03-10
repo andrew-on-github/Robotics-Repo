@@ -668,15 +668,15 @@ void usercontrol(void) {
 
 
     
-    //spinning motors and activating hydraulics
-    // LeftBackMotor.spin(fwd);
-    // LeftFrontMotor.spin(fwd);
-    // RightBackMotor.spin(fwd);
-    // RightFrontMotor.spin(fwd);
+    // spinning motors and activating hydraulics
+    LeftBackMotor.spin(fwd);
+    LeftFrontMotor.spin(fwd);
+    RightBackMotor.spin(fwd);
+    RightFrontMotor.spin(fwd);
 
-    // IntakeMotor.spin(fwd);
+    IntakeMotor.spin(fwd);
 
-    // ClampPiston.set(clamp);
+    ClampPiston.set(clamp);
 
     //update clamplast so inputs arent counted multiple times
     clampLast = Controller1.ButtonR2.pressing();
