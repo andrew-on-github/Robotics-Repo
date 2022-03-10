@@ -610,27 +610,27 @@ void usercontrol(void) {
     //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) < deadzone) {
       //stopping if joystick within deadzone
-      LeftBackMotor.setVelocity(0, percent);
-      LeftFrontMotor.setVelocity(0, percent);
+      RightBackMotor.setVelocity(0, percent);
+      RightFrontMotor.setVelocity(0, percent);
       //sets motors to brake mode
-      LeftBackMotor.stop();
-      LeftFrontMotor.stop();
+      RightBackMotor.stop();
+      RightFrontMotor.stop();
     }
     else{
       //setting motor velocity
-      LeftBackMotor.setVelocity(leftMotorSpeed, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
+      RightBackMotor.setVelocity(-leftMotorSpeed, percent);
+      RightFrontMotor.setVelocity(-leftMotorSpeed, percent);
     }
 
 
     //same as above
     if(abs(rightMotorSpeed) < deadzone) {
-      RightBackMotor.setVelocity(0, percent);
-      RightFrontMotor.setVelocity(0, percent);
+      LeftBackMotor.setVelocity(0, percent);
+      LeftFrontMotor.setVelocity(0, percent);
     }
     else{
-      RightBackMotor.setVelocity(rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
+      LeftBackMotor.setVelocity(-rightMotorSpeed, percent);
+      LeftFrontMotor.setVelocity(-rightMotorSpeed, percent);
     }
 
     //Lift: L2 Toggles between Low and target positions
