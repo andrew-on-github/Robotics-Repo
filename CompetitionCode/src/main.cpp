@@ -14,19 +14,16 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftFrontMotor       motor         2               
-// LeftBackMotor        motor         11              
-// RightFrontMotor      motor         8               
-// RightBackMotor       motor         18              
-// MobileGoalMotor      motor         3               
+// LeftFrontMotor       motor         3               
+// LeftBackMotor        motor         1               
+// RightFrontMotor      motor         4               
+// RightBackMotor       motor         2               
 // AutoTest             digital_in    H               
-// ClampMotor           motor         17              
+// ClampMotor           motor         6               
 // LiftPot              potV2         A               
-// MobileGoalPot        potV2         B               
-// ClampPot             pot           C               
-// LeftLiftMotor        motor         19              
-// RightLiftMotor       motor         20              
-// InertialSensor       inertial      15              
+// LeftLiftMotor        motor         9               
+// RightLiftMotor       motor         10              
+// ClampPot             potV2         C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -63,7 +60,6 @@ int selectedAuto = 0;
 
 //motor controller objects 
 MotorController* LiftMotorController;
-MotorController* MobileGoalMotorController;
 MotorController* ClampMotorController;
 
 PositionMonitor* RobotPosition;
@@ -105,7 +101,6 @@ const double CLAMP_OUT_POSITION = 187;
 const double CLAMP_IN_POSITION = 80;
 
 const double LIFT_TAU = 0.25;
-const double MOBILE_GOAL_TAU = 0.25;
 const double CLAMP_TAU = 2.5;
 
 double liftTarget = LIFT_LOW_POSITION;
@@ -113,27 +108,11 @@ double clampTarget = CLAMP_IN_POSITION;
 
 const double EPSILON = 1E-5;
 
-// target angle of the mobile goal
-const double MOBILE_GOAL_EXTENDED = 190;
-const double MOBILE_GOAL_RETRACTED = 125;
-double mobileGoalTarget = MOBILE_GOAL_RETRACTED;
-
 //declaring and initializing preauto flag
 bool preauto = true;
 
 //declaring and initializing liftmotor group
 motor_group LiftMotor = motor_group(LeftLiftMotor, RightLiftMotor);
-
-void mobileGoalFSA(){
- if(fabs(mobileGoalTarget - MOBILE_GOAL_EXTENDED) < EPSILON) {
-   mobileGoalTarget = MOBILE_GOAL_RETRACTED;
-   MobileGoalMotorController->setOverRidePercent(-100);
-   MobileGoalMotorController->setOverRideCycles(15);
- }
- else{
-   mobileGoalTarget = MOBILE_GOAL_EXTENDED;
- }
-}
 
 const double MC_THRESHOLD_LIFT_UP = 10;
 const double MC_THRESHOLD_LIFT_DOWN = 1000000;
@@ -188,7 +167,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[7] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor, &MobileGoalMotor};
+  motor* motors[7] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 100; //temperature at which the brain throttles control
@@ -307,11 +286,7 @@ void pre_auton(void) {
 
   //initializing motor controllers
   LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
-  MobileGoalMotorController = new MotorController(&MobileGoalMotor, &MobileGoalPot, &mobileGoalTarget, MOBILE_GOAL_TAU);
   ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
-
-  //initializing position monitor
-  RobotPosition = new PositionMonitor(&InertialSensor, DELTA_TIME, msec);
 
   //double buffering
   Brain.Screen.render(true, false);
@@ -422,7 +397,6 @@ void autonomous(void) {
   preauto = false;
 
   LiftMotorController->setEnabled(true);
-  MobileGoalMotorController->setEnabled(true);
   ClampMotorController->setEnabled(true);
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
@@ -430,16 +404,6 @@ void autonomous(void) {
 
     switch(selectedAuto){
       case 0:
-        //wheel circumfrence = 12.56637", divide travel distance in inches by wheel circumfrence constatn"
-        mobileGoalFSA();
-        DriveMotorGroup.spinFor(vex::forward, 80 / WHEEL_CIRCUMFRENCE, rev, 60 * 30 / WHEEL_CIRCUMFRENCE / .85, rpm, false);
-        wait(1.75, sec);
-        mobileGoalFSA();
-        wait(1, sec);
-        DriveMotorGroup.spinFor(reverse, 75 / WHEEL_CIRCUMFRENCE, rev, 60 * 30 / WHEEL_CIRCUMFRENCE, rpm, false);
-        wait(1, sec);
-        mobileGoalFSA();
-
         break;
       
       case 1:
@@ -459,7 +423,6 @@ void autonomous(void) {
         break;
     }
   LiftMotorController->setEnabled(false);
-  MobileGoalMotorController->setEnabled(false);
   ClampMotorController->setEnabled(false);
 }
 
@@ -489,7 +452,6 @@ void usercontrol(void) {
 
   //allowing motor controllers to control their motors
   LiftMotorController->setEnabled(true);
-  MobileGoalMotorController->setEnabled(true);
   ClampMotorController->setEnabled(true);
 
   //declaring and initializing last vars
@@ -571,11 +533,6 @@ void usercontrol(void) {
     //Clamp: R2 toggles
     if(Controller1.ButtonR2.pressing() && !r2Last){
       clampFSA();
-    }
-
-    //Mobile Goal: L1 toggles
-    if(Controller1.ButtonL1.pressing() && !l1Last){
-      mobileGoalFSA();
     }
     
     //spinning motors and activating hydraulics
