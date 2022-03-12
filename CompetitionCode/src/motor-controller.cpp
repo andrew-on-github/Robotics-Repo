@@ -6,6 +6,7 @@ using namespace std;
 const double WAIT_TIME = 25; // msec
 
 void controlMotor(void *arg) {
+  printf("controlmotor \n");
   MotorController *mc = (MotorController *)arg;
   double tau = mc->getTau();
 
@@ -24,7 +25,7 @@ void controlMotor(void *arg) {
     }
 
     if(mc->getEnabled()){
-      //mc->spinMotors(speed);
+      mc->spinMotors(speed);
     }
     wait(WAIT_TIME, msec);
   }

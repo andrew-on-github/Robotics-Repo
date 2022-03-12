@@ -10,7 +10,6 @@ extern motor LeftFrontMotor;
 extern motor LeftBackMotor;
 extern motor RightFrontMotor;
 extern motor RightBackMotor;
-extern digital_in AutoTest;
 extern motor ClampMotor;
 extern potV2 LiftPot;
 extern motor LeftLiftMotor;

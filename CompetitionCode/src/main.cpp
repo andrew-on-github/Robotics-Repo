@@ -18,7 +18,6 @@
 // LeftBackMotor        motor         1               
 // RightFrontMotor      motor         4               
 // RightBackMotor       motor         2               
-// AutoTest             digital_in    H               
 // ClampMotor           motor         6               
 // LiftPot              potV2         A               
 // LeftLiftMotor        motor         9               
@@ -94,8 +93,8 @@ const double DELTA_TIME = 10;
 const int USERCONTROL_TIME_SECONDS = 105;
 
 // target angle of the lift
-const double LIFT_HIGH_POSITION = 120;
-const double LIFT_LOW_POSITION = 27;
+const double LIFT_HIGH_POSITION = 205;
+const double LIFT_LOW_POSITION = 115;
 
 const double CLAMP_OUT_POSITION = 187;
 const double CLAMP_IN_POSITION = 80;
@@ -117,6 +116,7 @@ motor_group LiftMotor = motor_group(LeftLiftMotor, RightLiftMotor);
 const double MC_THRESHOLD_LIFT_UP = 10;
 const double MC_THRESHOLD_LIFT_DOWN = 1000000;
 
+/*
 void clampFSA(){
   if(fabs(clampTarget - CLAMP_OUT_POSITION) < EPSILON){
     clampTarget = CLAMP_IN_POSITION;
@@ -124,7 +124,7 @@ void clampFSA(){
   else{
     clampTarget = CLAMP_OUT_POSITION;
   }
-}
+}*/
 
 //l2
 void liftFSA(){
@@ -167,7 +167,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[7] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor};
+  motor* motors[6] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 100; //temperature at which the brain throttles control
@@ -237,8 +237,8 @@ void controllerScreen(){
       else if(hiMotor == motors[4] || hiMotor == motors[5]){
         Controller1.Screen.print("LM");
       }
-      else if(hiMotor == motors[6]){
-        Controller1.Screen.print("MG");
+      else if(hiMotor == motors[5]){
+        Controller1.Screen.print("CM");
       }
       Controller1.Screen.print(" WARN");
       Controller1.Screen.newLine();
@@ -247,7 +247,7 @@ void controllerScreen(){
     else{
       //make sure that the correct number of digits is printed for seconds
       if(secondsRemaining < 10){
-        Controller1.Screen.print("TIME: %d:0%d", minutesRemaining, secondsRemaining);
+        Controller1.Screen.print("TIME WARN");
       }
       else{
         Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
@@ -256,7 +256,7 @@ void controllerScreen(){
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
       Controller1.Screen.newLine();
-      Controller1.Screen.print("X POS: %.2f", RobotPosition->getXPos());
+      Controller1.Screen.print("ANGLE: %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -272,6 +272,7 @@ void controllerScreen(){
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
+  printf("preauton begin \n");
   vexcodeInit();
   
   //initializing selected auto to 0
@@ -285,12 +286,13 @@ void pre_auton(void) {
   bool selected = false;
 
   //initializing motor controllers
+  printf("motorcontrollers initialized \n");
   LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
-  ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
+  // ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
 
   //double buffering
   Brain.Screen.render(true, false);
-
+  printf("preauton loop entered\n");
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
     //if menucycle is pressed and auton is not locked in
@@ -395,9 +397,9 @@ void autonomous(void) {
   
   //updating flag to cause preauton method to exit
   preauto = false;
-
+  printf("autonomous begun\n");
   LiftMotorController->setEnabled(true);
-  ClampMotorController->setEnabled(true);
+  // ClampMotorController->setEnabled(true);
 
   Brain.Screen.print("Robot under autonomous control. Please stand clear.");
   Controller1.Screen.print("AUTO");
@@ -423,7 +425,8 @@ void autonomous(void) {
         break;
     }
   LiftMotorController->setEnabled(false);
-  ClampMotorController->setEnabled(false);
+  // ClampMotorController->setEnabled(false);
+  printf("autonomous ended\n");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -437,12 +440,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  printf("usercontrol\n");
 
   new thread(controllerScreen);
-
-
-
-  
 
   //updating flag to cause preauton method to exit
   preauto = false;
@@ -452,7 +452,7 @@ void usercontrol(void) {
 
   //allowing motor controllers to control their motors
   LiftMotorController->setEnabled(true);
-  ClampMotorController->setEnabled(true);
+  // ClampMotorController->setEnabled(true);
 
   //declaring and initializing last vars
   bool l1Last = false;
@@ -471,6 +471,7 @@ void usercontrol(void) {
 
   int avgMotorSpeed = 0;
 
+  printf("usercontrol loop entered\n");
   // User control code here, inside the loop 
   while (true) {
 
@@ -531,15 +532,26 @@ void usercontrol(void) {
     }
 
     //Clamp: R2 toggles
-    if(Controller1.ButtonR2.pressing() && !r2Last){
-      clampFSA();
+    // if(Controller1.ButtonR2.pressing() && !r2Last){
+    //   clampFSA();
+    // }
+    if(Controller1.ButtonR2.pressing()){
+       ClampMotor.setVelocity(100, percent);
+    }  
+    else if(Controller1.ButtonR1.pressing()){
+      ClampMotor.setVelocity(-100, percent);
     }
-    
+    else{
+      ClampMotor.setVelocity(0, percent);
+    }
+
     //spinning motors and activating hydraulics
-    //LeftBackMotor.spin(fwd);
-    //LeftFrontMotor.spin(fwd);
-    //RightBackMotor.spin(fwd);
-    //RightFrontMotor.spin(fwd);
+    LeftBackMotor.spin(fwd);
+    LeftFrontMotor.spin(fwd);
+    RightBackMotor.spin(fwd);
+    RightFrontMotor.spin(fwd);
+
+    ClampMotor.spin(fwd);
     
     //update clamplast so inputs arent counted multiple times
     r2Last = Controller1.ButtonR2.pressing();
@@ -558,38 +570,19 @@ void usercontrol(void) {
 //
 int main() {
   // Set up callbacks for autonomous and driver control periods.
+  printf("main callbacks \n");
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
+  printf("calling preauton\n");
   pre_auton();
 
   // Prevent main from exiting with an infinite loop.
-  // check for test jumpers, if present run user control or autotest
-  while (true) {
-      //if the correct jumpers are in place and the competition switch is disconnected, activate the auto test mode or go directly to user control
-    if(AutoTest && !Competition.isCompetitionSwitch()){
-      while(1){
-        //use letter buttons to select autonomous, run with r2
-        //afterwards, select again
-        while(!Controller1.ButtonR2.pressing()){
-          if(Controller1.ButtonA.pressing()){
-            selectedAuto = 0;
-          }
-          else if(Controller1.ButtonB.pressing()){
-            selectedAuto = 1;
-          }
-          else if(Controller1.ButtonX.pressing()){
-            selectedAuto = 2;
-          }
-          else if(Controller1.ButtonY.pressing()){
-            selectedAuto = 3;
-          }
-      }
-    }
-      autonomous();
-    }
-    wait(100, msec);
-  }
+  printf("main loop entered \n");
+  // while(true){
+  //   wait(25, msec);
+  // }
 }
+
 
