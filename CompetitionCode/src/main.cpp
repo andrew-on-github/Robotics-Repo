@@ -1,4 +1,4 @@
-//git main
+//git 35A2022
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -18,11 +18,6 @@
 // LeftBackMotor        motor         1               
 // RightFrontMotor      motor         4               
 // RightBackMotor       motor         2               
-// ClampMotor           motor         6               
-// LiftPot              potV2         A               
-// LeftLiftMotor        motor         9               
-// RightLiftMotor       motor         10              
-// ClampPot             potV2         C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -73,9 +68,6 @@ PositionMonitor* RobotPosition;
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-//global to count the number of actuations of clamp
-int clampActuations = 0;
-
 //const to decide the amount of time before braking starts. 1 braking time = 1 usercontrol 
 //loop cycle = .25 msec
 const int BRAKING_TIME = 500;
@@ -86,35 +78,13 @@ int brakingTimeReamining = BRAKING_TIME;
 //wheel circumfrence const
 const double WHEEL_CIRCUMFRENCE = 12.56637;
 
-//delta time constant
-const double DELTA_TIME = 10;
-
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
 
-// target angle of the lift
-const double LIFT_HIGH_POSITION = 205;
-const double LIFT_LOW_POSITION = 115;
-
-const double CLAMP_OUT_POSITION = 187;
-const double CLAMP_IN_POSITION = 80;
-
-const double LIFT_TAU = 0.25;
-const double CLAMP_TAU = 2.5;
-
-double liftTarget = LIFT_LOW_POSITION;
-double clampTarget = CLAMP_IN_POSITION;
-
 const double EPSILON = 1E-5;
 
-//declaring and initializing preauto flag
+//declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
-
-//declaring and initializing liftmotor group
-motor_group LiftMotor = motor_group(LeftLiftMotor, RightLiftMotor);
-
-const double MC_THRESHOLD_LIFT_UP = 10;
-const double MC_THRESHOLD_LIFT_DOWN = 1000000;
 
 /*
 void clampFSA(){
@@ -125,18 +95,6 @@ void clampFSA(){
     clampTarget = CLAMP_OUT_POSITION;
   }
 }*/
-
-//l2
-void liftFSA(){
-  if(fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
-    liftTarget = LIFT_HIGH_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
-  }
-  else if(fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
-    liftTarget = LIFT_LOW_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
-  }
-}
 
 int controllerCurve(int input, double curve){
   
@@ -167,7 +125,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[6] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor};
+  motor* motors[6] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 100; //temperature at which the brain throttles control
@@ -255,8 +213,6 @@ void controllerScreen(){
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
-      Controller1.Screen.newLine();
-      Controller1.Screen.print("ANGLE: %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -287,7 +243,6 @@ void pre_auton(void) {
 
   //initializing motor controllers
   printf("motorcontrollers initialized \n");
-  LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
   // ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
 
   //double buffering
@@ -525,33 +480,11 @@ void usercontrol(void) {
       brakingTimeReamining = BRAKING_TIME;
     }
 
-    //Lift: L2 Toggles between Low and target positions
-    //Right toggles target between the highest value and the target value
-    if(Controller1.ButtonL2.pressing() && !l2Last){
-      liftFSA();
-    }
-
-    //Clamp: R2 toggles
-    // if(Controller1.ButtonR2.pressing() && !r2Last){
-    //   clampFSA();
-    // }
-    if(Controller1.ButtonR2.pressing()){
-       ClampMotor.setVelocity(100, percent);
-    }  
-    else if(Controller1.ButtonR1.pressing()){
-      ClampMotor.setVelocity(-100, percent);
-    }
-    else{
-      ClampMotor.setVelocity(0, percent);
-    }
-
     //spinning motors and activating hydraulics
     LeftBackMotor.spin(fwd);
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
-
-    ClampMotor.spin(fwd);
     
     //update clamplast so inputs arent counted multiple times
     r2Last = Controller1.ButtonR2.pressing();

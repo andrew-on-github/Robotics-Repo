@@ -15,11 +15,6 @@ motor LeftFrontMotor = motor(PORT3, ratio18_1, false);
 motor LeftBackMotor = motor(PORT1, ratio18_1, false);
 motor RightFrontMotor = motor(PORT4, ratio18_1, true);
 motor RightBackMotor = motor(PORT2, ratio18_1, true);
-motor ClampMotor = motor(PORT6, ratio18_1, false);
-potV2 LiftPot = potV2(Brain.ThreeWirePort.A);
-motor LeftLiftMotor = motor(PORT9, ratio36_1, false);
-motor RightLiftMotor = motor(PORT10, ratio36_1, true);
-potV2 ClampPot = potV2(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
