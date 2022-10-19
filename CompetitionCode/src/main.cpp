@@ -2,7 +2,8 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim      */
+/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim,     */
+/*                  Jack Cataldo                                              */
 /*    Created:      Thu Sep 26 2019                                           */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
@@ -21,7 +22,6 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-
 #include "motor-controller.h"
 #include "position.h"
 
