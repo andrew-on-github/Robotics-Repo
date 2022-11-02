@@ -23,7 +23,6 @@
 
 #include "vex.h"
 #include "motor-controller.h"
-#include "position.h"
 
 using namespace vex;
 using namespace std;
@@ -51,13 +50,6 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
-
-//motor controller objects 
-MotorController* LiftMotorController;
-MotorController* ClampMotorController;
-
-PositionMonitor* RobotPosition;
-
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -74,9 +66,6 @@ const int BRAKING_TIME = 500;
 
 //var to count amount of time reamining before breaking
 int brakingTimeReamining = BRAKING_TIME;
-
-//wheel circumfrence const
-const double WHEEL_CIRCUMFRENCE = 12.56637;
 
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
@@ -125,7 +114,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[6] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
+  motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 100; //temperature at which the brain throttles control
@@ -192,12 +181,6 @@ void controllerScreen(){
       else if(hiMotor == motors[3]){
         Controller1.Screen.print("RB");
       }
-      else if(hiMotor == motors[4] || hiMotor == motors[5]){
-        Controller1.Screen.print("LM");
-      }
-      else if(hiMotor == motors[5]){
-        Controller1.Screen.print("CM");
-      }
       Controller1.Screen.print(" WARN");
       Controller1.Screen.newLine();
       Controller1.Screen.print("%f °C", hiMotor->temperature(celsius));
@@ -241,13 +224,9 @@ void pre_auton(void) {
   //true when autonomous is "locked in" false when still selecting
   bool selected = false;
 
-  //initializing motor controllers
-  printf("motorcontrollers initialized \n");
-  // ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
-
   //double buffering
   Brain.Screen.render(true, false);
-  printf("preauton loop entered\n");
+
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
     //if menucycle is pressed and auton is not locked in
@@ -353,10 +332,8 @@ void autonomous(void) {
   //updating flag to cause preauton method to exit
   preauto = false;
   printf("autonomous begun\n");
-  LiftMotorController->setEnabled(true);
-  // ClampMotorController->setEnabled(true);
 
-  Brain.Screen.print("Robot under autonomous control. Please stand clear.");
+  Brain.Screen.print("Running Autonomous No. ");
   Controller1.Screen.print("AUTO");
 
     switch(selectedAuto){
@@ -379,8 +356,6 @@ void autonomous(void) {
         Brain.Screen.print("error");
         break;
     }
-  LiftMotorController->setEnabled(false);
-  // ClampMotorController->setEnabled(false);
   printf("autonomous ended\n");
 }
 
@@ -404,10 +379,6 @@ void usercontrol(void) {
 
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
-
-  //allowing motor controllers to control their motors
-  LiftMotorController->setEnabled(true);
-  // ClampMotorController->setEnabled(true);
 
   //declaring and initializing last vars
   bool l1Last = false;
@@ -485,12 +456,6 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
-    
-    //update clamplast so inputs arent counted multiple times
-    r2Last = Controller1.ButtonR2.pressing();
-    l2Last = Controller1.ButtonL2.pressing();
-    rightLast = Controller1.ButtonRight.pressing();
-    l1Last = Controller1.ButtonL1.pressing();
 
     //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
@@ -503,19 +468,11 @@ void usercontrol(void) {
 //
 int main() {
   // Set up callbacks for autonomous and driver control periods.
-  printf("main callbacks \n");
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
-  printf("calling preauton\n");
   pre_auton();
-
-  // Prevent main from exiting with an infinite loop.
-  printf("main loop entered \n");
-  // while(true){
-  //   wait(25, msec);
-  // }
 }
 
 
