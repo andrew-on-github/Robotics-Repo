@@ -72,6 +72,8 @@ const int USERCONTROL_TIME_SECONDS = 105;
 
 const double EPSILON = 1E-5;
 
+const double CURVE = 0.1;
+
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
 
@@ -389,7 +391,7 @@ void usercontrol(void) {
   //default deadzone value 
   //want this to be as low as possible without any drift
   //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
-  int deadzone = 3;
+  int deadzone = 0;
 
   //declaring motor speed vars
   int leftMotorSpeed = 0;
@@ -411,6 +413,9 @@ void usercontrol(void) {
       leftMotorSpeed = avgMotorSpeed;
       rightMotorSpeed = avgMotorSpeed;
     }
+
+    leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
+    rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
 
     //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) < deadzone) {
