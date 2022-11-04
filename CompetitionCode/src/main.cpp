@@ -70,38 +70,29 @@ int brakingTimeReamining = BRAKING_TIME;
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
 
-const double EPSILON = 1E-5;
-
-const double CURVE = 0.1;
+const double CURVE = 0.2;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
 
-/*
-void clampFSA(){
-  if(fabs(clampTarget - CLAMP_OUT_POSITION) < EPSILON){
-    clampTarget = CLAMP_IN_POSITION;
-  }
-  else{
-    clampTarget = CLAMP_OUT_POSITION;
-  }
-}*/
-
-int controllerCurve(int input, double curve){
+double controllerCurve(int input, double curve){
   
-  double dubInput = input;
+  double dubInput = fabs(input);
 
   dubInput /= 100;
 
   dubInput = pow(dubInput, curve);
 
+  if(input >= 0){
+    dubInput = (int)dubInput;
+  }
+  else{
+    dubInput = -1 * ((int)(dubInput));
+  }
+
   dubInput *= 100;
 
-  if(input >= 0){
-    return (int)dubInput;
-  }
-  return -((int)(fabs(dubInput)));
-
+  return dubInput;
 }
 
 void controllerScreen(){
