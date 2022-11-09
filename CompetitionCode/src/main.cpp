@@ -60,28 +60,36 @@ int selectedAuto = 0;
 /*  not every time that the robot is disabled.                               */
 /*---------------------------------------------------------------------------*/
 
-//const to decide the amount of time before braking starts. 1 braking time = 1 usercontrol 
-//loop cycle = .25 msec
-const int BRAKING_TIME = 500;
+//time before brakes activate in msec
+const int BRAKING_TIME = 250;
+
+//difference between controller thumbsticks before they lock together
+const int CONTROLLER_MATCHING_THRESHOLD = 20;
 
 //var to count amount of time reamining before breaking
-int brakingTimeReamining = BRAKING_TIME;
+int brakingTimeRemaining = BRAKING_TIME;
 
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
 
-const double CURVE = 0.2;
+//default deadzone value 
+//want this to be as low as possible without any drift
+//test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
+const int DEADZONE = 0;
+
+const double CURVE = 0.7;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
-
 double controllerCurve(int input, double curve){
   
-  double dubInput = fabs(input);
+  double dubInput = fabs((double)input);
 
   dubInput /= 100;
 
   dubInput = pow(dubInput, curve);
+
+  dubInput *= 100;
 
   if(input >= 0){
     dubInput = (int)dubInput;
@@ -89,8 +97,6 @@ double controllerCurve(int input, double curve){
   else{
     dubInput = -1 * ((int)(dubInput));
   }
-
-  dubInput *= 100;
 
   return dubInput;
 }
@@ -204,7 +210,6 @@ void controllerScreen(){
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  printf("preauton begin \n");
   vexcodeInit();
   
   //initializing selected auto to 0
@@ -324,7 +329,6 @@ void autonomous(void) {
   
   //updating flag to cause preauton method to exit
   preauto = false;
-  printf("autonomous begun\n");
 
   Brain.Screen.print("Running Autonomous No. ");
   Controller1.Screen.print("AUTO");
@@ -349,7 +353,6 @@ void autonomous(void) {
         Brain.Screen.print("error");
         break;
     }
-  printf("autonomous ended\n");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -363,7 +366,6 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  printf("usercontrol\n");
 
   new thread(controllerScreen);
 
@@ -379,26 +381,20 @@ void usercontrol(void) {
   bool l2Last = false;
   bool rightLast = false;
 
-  //default deadzone value 
-  //want this to be as low as possible without any drift
-  //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
-  int deadzone = 0;
-
   //declaring motor speed vars
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
   int avgMotorSpeed = 0;
 
-  printf("usercontrol loop entered\n");
   // User control code here, inside the loop 
   while (true) {
 
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
-    //if the absolute difference between the sticks is within 10, and they have the same sign
-    if((abs(leftMotorSpeed - rightMotorSpeed) <= 10)){
+    //if the absolute difference between the sticks is within 10, and they have the same sign, and neither of them are zero
+    if((abs(leftMotorSpeed - rightMotorSpeed) <= CONTROLLER_MATCHING_THRESHOLD) && rightMotorSpeed != 0 && leftMotorSpeed != 0){
       //set the motor outputs to the avg of the two
       avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
       leftMotorSpeed = avgMotorSpeed;
@@ -409,42 +405,31 @@ void usercontrol(void) {
     rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
 
     //LeftMotor: Left Stick with deadzone
-    if(abs(leftMotorSpeed) < deadzone) {
+    if(abs(leftMotorSpeed) <= DEADZONE && rightMotorSpeed <= DEADZONE) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
-      //sets motors to brake mode
-      if(brakingTimeReamining <= 0){
-        LeftBackMotor.stop(hold);
-        LeftFrontMotor.stop(hold);
-      }
-      else if(brakingTimeReamining > 0){
-        brakingTimeReamining--;
-      }
+      RightBackMotor.setVelocity(0, percent);
+      RightFrontMotor.setVelocity(0, percent);
+      brakingTimeRemaining -= 25;
     }
     else{
       //setting motor velocity
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
-      brakingTimeReamining = BRAKING_TIME;
+      RightBackMotor.setVelocity(rightMotorSpeed, percent);
+      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
+      brakingTimeRemaining = BRAKING_TIME;
     }
 
     //same as above
-    if(abs(rightMotorSpeed) < deadzone) {
+    if(abs(rightMotorSpeed) < DEADZONE) {
       RightBackMotor.setVelocity(0, percent);
       RightFrontMotor.setVelocity(0, percent);
-      if(brakingTimeReamining <= 0){
-        RightBackMotor.stop(hold);
-        RightFrontMotor.stop(hold);
-      }
-      else if(brakingTimeReamining >0 ){
-        brakingTimeReamining--;
-      }
     }
     else{
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
-      brakingTimeReamining = BRAKING_TIME;
     }
 
     //spinning motors and activating hydraulics
@@ -452,6 +437,18 @@ void usercontrol(void) {
     LeftFrontMotor.spin(fwd);
     RightBackMotor.spin(fwd);
     RightFrontMotor.spin(fwd);
+
+
+    if(brakingTimeRemaining <= 0){
+        printf("stopped\n");
+        LeftBackMotor.stop(hold);
+        LeftFrontMotor.stop(hold);
+        RightBackMotor.stop(hold);
+        RightFrontMotor.stop(hold);
+    }
+    else{
+      printf("not stopped\n");
+    }
 
     //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
