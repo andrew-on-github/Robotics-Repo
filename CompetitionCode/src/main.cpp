@@ -61,7 +61,7 @@ int selectedAuto = 0;
 /*---------------------------------------------------------------------------*/
 
 //time before brakes activate in msec
-const int BRAKING_TIME = 250;
+const int BRAKING_TIME = 500;
 
 //difference between controller thumbsticks before they lock together
 const int CONTROLLER_MATCHING_THRESHOLD = 20;
@@ -405,7 +405,7 @@ void usercontrol(void) {
     rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
 
     //LeftMotor: Left Stick with deadzone
-    if(abs(leftMotorSpeed) <= DEADZONE && rightMotorSpeed <= DEADZONE) {
+    if(abs(leftMotorSpeed) <= DEADZONE && abs(rightMotorSpeed) <= DEADZONE) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
@@ -422,34 +422,19 @@ void usercontrol(void) {
       brakingTimeRemaining = BRAKING_TIME;
     }
 
-    //same as above
-    if(abs(rightMotorSpeed) < DEADZONE) {
-      RightBackMotor.setVelocity(0, percent);
-      RightFrontMotor.setVelocity(0, percent);
-    }
-    else{
-      RightBackMotor.setVelocity(rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
-    }
-
-    //spinning motors and activating hydraulics
-    LeftBackMotor.spin(fwd);
-    LeftFrontMotor.spin(fwd);
-    RightBackMotor.spin(fwd);
-    RightFrontMotor.spin(fwd);
-
-
     if(brakingTimeRemaining <= 0){
-        printf("stopped\n");
         LeftBackMotor.stop(hold);
         LeftFrontMotor.stop(hold);
         RightBackMotor.stop(hold);
         RightFrontMotor.stop(hold);
     }
     else{
-      printf("not stopped\n");
+      //spinning motors and activating hydraulics
+      LeftBackMotor.spin(fwd);
+      LeftFrontMotor.spin(fwd);
+      RightBackMotor.spin(fwd);
+      RightFrontMotor.spin(fwd);
     }
-
     //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
