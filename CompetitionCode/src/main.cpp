@@ -116,7 +116,7 @@ void controllerScreen(){
   motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
 
   motor* hiMotor = 0;
-  const int WARNING_TEMP = 100; //temperature at which the brain throttles control
+  const int WARNING_TEMP = 65; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
 
