@@ -119,6 +119,7 @@ void controllerScreen(){
   const int WARNING_TEMP = 65; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
+  Controller1.Screen.clearScreen();
 
   while(true){
     //timer calculations
@@ -182,16 +183,11 @@ void controllerScreen(){
       }
       Controller1.Screen.print(" WARN");
       Controller1.Screen.newLine();
-      Controller1.Screen.print("%f °C", hiMotor->temperature(celsius));
+      Controller1.Screen.print("%.2f °C", hiMotor->temperature(celsius));
     }
     else{
       //make sure that the correct number of digits is printed for seconds
-      if(secondsRemaining < 10){
-        Controller1.Screen.print("TIME WARN");
-      }
-      else{
-        Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
-      }
+      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
