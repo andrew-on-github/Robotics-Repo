@@ -77,7 +77,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
 
-const double CURVE = 0.7;
+const double CURVE = 1.7;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
