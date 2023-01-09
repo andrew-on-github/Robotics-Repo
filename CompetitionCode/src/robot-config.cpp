@@ -11,9 +11,7 @@ brain  Brain;
 controller Controller1 = controller(primary);
 limit MenuCycle = limit(Brain.ThreeWirePort.D);
 limit MenuSelect = limit(Brain.ThreeWirePort.E);
-motor LeftFrontMotor = motor(PORT2, ratio18_1, false);
 motor LeftBackMotor = motor(PORT10, ratio18_1, false);
-motor RightFrontMotor = motor(PORT1, ratio18_1, true);
 motor RightBackMotor = motor(PORT8, ratio18_1, true);
 
 // VEXcode generated functions

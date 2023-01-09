@@ -6,9 +6,7 @@ extern brain Brain;
 extern controller Controller1;
 extern limit MenuCycle;
 extern limit MenuSelect;
-extern motor LeftFrontMotor;
 extern motor LeftBackMotor;
-extern motor RightFrontMotor;
 extern motor RightBackMotor;
 
 /**

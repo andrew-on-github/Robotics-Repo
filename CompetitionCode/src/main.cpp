@@ -15,9 +15,7 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftFrontMotor       motor         2               
 // LeftBackMotor        motor         10              
-// RightFrontMotor      motor         1               
 // RightBackMotor       motor         8               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -29,11 +27,6 @@ using namespace std;
 
 // A global instance of competition
 competition Competition;
-
-vex::motor_group LeftMotorGroup(LeftFrontMotor, LeftBackMotor);
-vex::motor_group RightMotorGroup(RightFrontMotor, RightBackMotor);
-
-vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor, RightBackMotor);
 
 // define your global instances of motors and other devices here
 //katie was here
@@ -116,7 +109,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
+  motor* motors[4] = {&LeftBackMotor, &RightBackMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 65; //temperature at which the brain throttles control
@@ -417,32 +410,24 @@ void usercontrol(void) {
     if(abs(leftMotorSpeed) <= DEADZONE && abs(rightMotorSpeed) <= DEADZONE) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
-      LeftFrontMotor.setVelocity(0, percent);
       RightBackMotor.setVelocity(0, percent);
-      RightFrontMotor.setVelocity(0, percent);
       brakingTimeRemaining -= 25;
     }
     else{
       //setting motor velocity
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
-      LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
-      RightFrontMotor.setVelocity(rightMotorSpeed, percent);
       brakingTimeRemaining = BRAKING_TIME;
     }
 
     if(brakingTimeRemaining <= 0){
         LeftBackMotor.stop(hold);
-        LeftFrontMotor.stop(hold);
         RightBackMotor.stop(hold);
-        RightFrontMotor.stop(hold);
     }
     else{
       //spinning motors and activating hydraulics
       LeftBackMotor.spin(fwd);
-      LeftFrontMotor.spin(fwd);
       RightBackMotor.spin(fwd);
-      RightFrontMotor.spin(fwd);
     }
     //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
