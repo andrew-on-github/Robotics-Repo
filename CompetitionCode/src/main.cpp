@@ -397,11 +397,11 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
-    if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonA.pressing()){
+    if(Controller1.ButtonL1.pressing() && !Controller1.ButtonR1.pressing()){
       leftMotorSpeed = -5;
       rightMotorSpeed = 5;
     }
-    else if(!Controller1.ButtonLeft.pressing() && Controller1.ButtonA.pressing()){
+    else if(!Controller1.ButtonL1.pressing() && Controller1.ButtonR1.pressing()){
       leftMotorSpeed = 5;
       rightMotorSpeed = -5;
     }
