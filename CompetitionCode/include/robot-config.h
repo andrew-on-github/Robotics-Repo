@@ -8,6 +8,9 @@ extern limit MenuCycle;
 extern limit MenuSelect;
 extern motor LeftBackMotor;
 extern motor RightBackMotor;
+extern digital_out GreenLight;
+extern digital_out YellowLight;
+extern digital_out RedLight;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

@@ -17,6 +17,9 @@
 // MenuSelect           limit         E               
 // LeftBackMotor        motor         10              
 // RightBackMotor       motor         8               
+// GreenLight           digital_out   A               
+// YellowLight          digital_out   B               
+// RedLight             digital_out   C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"

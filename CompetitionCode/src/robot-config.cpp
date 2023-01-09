@@ -13,6 +13,9 @@ limit MenuCycle = limit(Brain.ThreeWirePort.D);
 limit MenuSelect = limit(Brain.ThreeWirePort.E);
 motor LeftBackMotor = motor(PORT10, ratio18_1, false);
 motor RightBackMotor = motor(PORT8, ratio18_1, true);
+digital_out GreenLight = digital_out(Brain.ThreeWirePort.A);
+digital_out YellowLight = digital_out(Brain.ThreeWirePort.B);
+digital_out RedLight = digital_out(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
