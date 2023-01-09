@@ -66,6 +66,9 @@ const int BRAKING_TIME = 750;
 //difference between controller thumbsticks before they lock together
 const int CONTROLLER_MATCHING_THRESHOLD = 25;
 
+//speed the motors run at when doing fine tuning control
+const int FINE_TUNING_SPEED = 7;
+
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
 
@@ -398,12 +401,12 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL1.pressing() && !Controller1.ButtonR1.pressing()){
-      leftMotorSpeed = -5;
-      rightMotorSpeed = 5;
+      leftMotorSpeed = -FINE_TUNING_SPEED;
+      rightMotorSpeed = FINE_TUNING_SPEED;
     }
     else if(!Controller1.ButtonL1.pressing() && Controller1.ButtonR1.pressing()){
-      leftMotorSpeed = 5;
-      rightMotorSpeed = -5;
+      leftMotorSpeed = FINE_TUNING_SPEED;
+      rightMotorSpeed = -FINE_TUNING_SPEED;
     }
     else{
       leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
