@@ -50,16 +50,6 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
-/*---------------------------------------------------------------------------*/
-
 //time before brakes activate in msec
 const int BRAKING_TIME = 500;
 
@@ -77,7 +67,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
 
-const double CURVE = 0.7;
+const double CURVE = 1.7;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
@@ -154,8 +144,6 @@ void controllerScreen(){
         hiMotor = currentMotor;
       }
     }
-
-
 
     //controller screen print commands
     //time takes precedence, followed by temp warning, followed by everything else
