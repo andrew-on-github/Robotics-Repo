@@ -397,8 +397,18 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
-    leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
-    rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
+    if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonA.pressing()){
+      leftMotorSpeed = -5;
+      rightMotorSpeed = 5;
+    }
+    else if(!Controller1.ButtonLeft.pressing() && Controller1.ButtonA.pressing()){
+      leftMotorSpeed = 5;
+      rightMotorSpeed = -5;
+    }
+    else{
+      leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
+      rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
+    }
 
     //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) <= DEADZONE && abs(rightMotorSpeed) <= DEADZONE) {
