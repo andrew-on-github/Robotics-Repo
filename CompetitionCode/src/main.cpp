@@ -59,6 +59,9 @@ const int CONTROLLER_MATCHING_THRESHOLD = 25;
 //speed the motors run at when doing fine tuning control
 const int FINE_TUNING_SPEED = 7;
 
+//forward and backward fine tuning control additive constant
+const int FWD_BWD_ADD = 4;
+
 //speed at which the motors run during aimAdjustment
 const double CURVE = 1.7; 
 
@@ -384,13 +387,21 @@ void usercontrol(void) {
     }
 
 
-    if(Controller1.ButtonL1.pressing() && !Controller1.ButtonR1.pressing()){
+    if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
       leftMotorSpeed = -FINE_TUNING_SPEED;
       rightMotorSpeed = FINE_TUNING_SPEED;
     }
-    else if(!Controller1.ButtonL1.pressing() && Controller1.ButtonR1.pressing()){
+    else if(!Controller1.ButtonLeft.pressing() && Controller1.ButtonRight.pressing()){
       leftMotorSpeed = FINE_TUNING_SPEED;
       rightMotorSpeed = -FINE_TUNING_SPEED;
+    }
+    else if(!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = -FINE_TUNING_SPEED + FWD_BWD_ADD;
+      rightMotorSpeed = -FINE_TUNING_SPEED + FWD_BWD_ADD;
+    }
+    else if(Controller1.ButtonUp.pressing() && !Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = FINE_TUNING_SPEED + FWD_BWD_ADD;
+      rightMotorSpeed = FINE_TUNING_SPEED + FWD_BWD_ADD;
     }
     else{
       leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
