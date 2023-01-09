@@ -51,10 +51,13 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 int selectedAuto = 0;
 
 //time before brakes activate in msec
-const int BRAKING_TIME = 500;
+const int BRAKING_TIME = 750;
 
 //difference between controller thumbsticks before they lock together
-const int CONTROLLER_MATCHING_THRESHOLD = 20;
+const int CONTROLLER_MATCHING_THRESHOLD = 25;
+
+//speed the motors run at when doing fine tuning control
+const int FINE_TUNING_SPEED = 7;
 
 //speed at which the motors run during aimAdjustment
 const double CURVE = 1.7; 
@@ -69,8 +72,6 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //want this to be as low as possible without any drift
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
-
-const double aimAdjustSpeed = 7.5;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
@@ -388,36 +389,19 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
-    //"left arrow" button will turn the robot counter-clockwise
 
-    if (Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
-      leftMotorSpeed = -aimAdjustSpeed;
-      rightMotorSpeed = aimAdjustSpeed;
+    if(Controller1.ButtonL1.pressing() && !Controller1.ButtonR1.pressing()){
+      leftMotorSpeed = -FINE_TUNING_SPEED;
+      rightMotorSpeed = FINE_TUNING_SPEED;
     }
-
-    //"right arrow" button will turn the robot clockwise
-
-    if (!Controller1.ButtonLeft.pressing() && Controller1.ButtonRight.pressing()){
-      leftMotorSpeed = aimAdjustSpeed;
-      rightMotorSpeed = -aimAdjustSpeed;
+    else if(!Controller1.ButtonL1.pressing() && Controller1.ButtonR1.pressing()){
+      leftMotorSpeed = FINE_TUNING_SPEED;
+      rightMotorSpeed = -FINE_TUNING_SPEED;
     }
-
-    //"up arrow" button will move the robot forwards
-
-    if (!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
-      leftMotorSpeed = aimAdjustSpeed;
-      rightMotorSpeed = aimAdjustSpeed;
+    else{
+      leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
+      rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
     }
-
-    //"down arrow" button will move the robot backwards
-
-    if (!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
-      leftMotorSpeed = -aimAdjustSpeed;
-      rightMotorSpeed = -aimAdjustSpeed;
-    }
-
-    leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
-    rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
 
     //LeftMotor: Left Stick with deadzone
     if(abs(leftMotorSpeed) <= DEADZONE && abs(rightMotorSpeed) <= DEADZONE) {
