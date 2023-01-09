@@ -61,10 +61,10 @@ int selectedAuto = 0;
 /*---------------------------------------------------------------------------*/
 
 //time before brakes activate in msec
-const int BRAKING_TIME = 500;
+const int BRAKING_TIME = 750;
 
 //difference between controller thumbsticks before they lock together
-const int CONTROLLER_MATCHING_THRESHOLD = 20;
+const int CONTROLLER_MATCHING_THRESHOLD = 25;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
@@ -77,7 +77,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
 
-const double CURVE = 1.7;
+const double CURVE = 1.5;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
