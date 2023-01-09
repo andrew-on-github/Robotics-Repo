@@ -56,6 +56,9 @@ const int BRAKING_TIME = 500;
 //difference between controller thumbsticks before they lock together
 const int CONTROLLER_MATCHING_THRESHOLD = 20;
 
+//speed at which the motors run during aimAdjustment
+const double CURVE = 1.7; 
+
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
 
@@ -67,7 +70,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
 
-const double CURVE = 1.7;
+const double aimAdjustSpeed = 7.5;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
@@ -383,6 +386,34 @@ void usercontrol(void) {
       avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
       leftMotorSpeed = avgMotorSpeed;
       rightMotorSpeed = avgMotorSpeed;
+    }
+
+    //"left arrow" button will turn the robot counter-clockwise
+
+    if (Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
+      leftMotorSpeed = -aimAdjustSpeed;
+      rightMotorSpeed = aimAdjustSpeed;
+    }
+
+    //"right arrow" button will turn the robot clockwise
+
+    if (!Controller1.ButtonLeft.pressing() && Controller1.ButtonRight.pressing()){
+      leftMotorSpeed = aimAdjustSpeed;
+      rightMotorSpeed = -aimAdjustSpeed;
+    }
+
+    //"up arrow" button will move the robot forwards
+
+    if (!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = aimAdjustSpeed;
+      rightMotorSpeed = aimAdjustSpeed;
+    }
+
+    //"down arrow" button will move the robot backwards
+
+    if (!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = -aimAdjustSpeed;
+      rightMotorSpeed = -aimAdjustSpeed;
     }
 
     leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
