@@ -46,16 +46,6 @@ competition Competition;
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
-/*---------------------------------------------------------------------------*/
-
 //time before brakes activate in msec
 const int BRAKING_TIME = 750;
 
