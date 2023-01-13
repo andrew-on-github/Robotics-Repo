@@ -1,3 +1,5 @@
 *.DS_Store
 **/build
 *compile_commands.json
+CompetitionCode/compile_commands.json
+CompetitionCode/CompetitionCode.v5code

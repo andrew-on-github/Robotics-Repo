@@ -15,10 +15,10 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftFrontMotor       motor         1               
-// LeftBackMotor        motor         2               
-// RightFrontMotor      motor         10              
-// RightBackMotor       motor         9               
+// LeftFrontMotor       motor         19              
+// LeftBackMotor        motor         20              
+// RightFrontMotor      motor         1               
+// RightBackMotor       motor         2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
