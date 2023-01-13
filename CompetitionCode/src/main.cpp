@@ -50,7 +50,7 @@ competition Competition;
 int selectedAuto = 0;
 
 //time before brakes activate in msec
-const int BRAKING_TIME = 750;
+const int BRAKING_TIME = 1500;
 
 //difference between controller thumbsticks before they lock together
 const int CONTROLLER_MATCHING_THRESHOLD = 25;
@@ -69,7 +69,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
 const int DEADZONE = 0;
 
-const double CURVE = 1.5;
+const double CURVE = 1.3;
 
 //declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
