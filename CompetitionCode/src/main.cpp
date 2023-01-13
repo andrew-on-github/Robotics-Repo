@@ -367,12 +367,6 @@ void usercontrol(void) {
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
-  //declaring and initializing last vars
-  bool l1Last = false;
-  bool r2Last = false;
-  bool l2Last = false;
-  bool rightLast = false;
-
   //declaring motor speed vars
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
