@@ -15,13 +15,13 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftBackMotor        motor         10              
-// RightBackMotor       motor         8               
+// LeftBackMotor        motor         12              
+// RightBackMotor       motor         3               
 // GreenLight           digital_out   A               
 // YellowLight          digital_out   B               
 // RedLight             digital_out   C               
-// FlywheelMotors       motor_group   20, 21          
-// IntakeMotor          motor         16              
+// FlywheelMotors       motor_group   2, 4            
+// IntakeMotor          motor         10              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
