@@ -50,7 +50,7 @@ competition Competition;
 int selectedAuto = 0;
 
 //time before brakes activate in msec
-const int BRAKING_TIME = 2000;
+const int BRAKING_TIME = 1000;
 
 //difference between controller thumbsticks before they lock together
 const int CONTROLLER_MATCHING_THRESHOLD = 25;
