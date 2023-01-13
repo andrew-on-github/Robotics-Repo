@@ -20,6 +20,8 @@
 // GreenLight           digital_out   A               
 // YellowLight          digital_out   B               
 // RedLight             digital_out   C               
+// FlywheelMotors       motor_group   20, 21          
+// IntakeMotor          motor         16              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -378,6 +380,30 @@ void usercontrol(void) {
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
+
+    if(Controller1.ButtonR2.pressing()){
+      FlywheelMotors.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonX.pressing()){
+      FlywheelMotors.setVelocity(-100, percent);
+    }
+    else{
+      FlywheelMotors.setVelocity(0, percent);
+    }
+
+    if(Controller1.ButtonL2.pressing()){
+      IntakeMotor.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonUp.pressing()){
+      IntakeMotor.setVelocity(-100, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
+    IntakeMotor.spin(vex::forward);
+    FlywheelMotors.spin(vex::forward);
+
     //if the absolute difference between the sticks is within 10, and they have the same sign, and neither of them are zero
     if((abs(leftMotorSpeed - rightMotorSpeed) <= CONTROLLER_MATCHING_THRESHOLD) && rightMotorSpeed != 0 && leftMotorSpeed != 0){
       //set the motor outputs to the avg of the two
