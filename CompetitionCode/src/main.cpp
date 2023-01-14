@@ -398,6 +398,7 @@ void usercontrol(void) {
     else{
       PistonMotor.setVelocity(0, percent);
     }
+    PistonMotor.spin(vex::forward);
 
     if(Controller1.ButtonR1.pressing()){
       FlywheelMotorLeft.setVelocity(100, percent);
@@ -411,6 +412,9 @@ void usercontrol(void) {
       FlywheelMotorLeft.setVelocity(0, percent);
       FlywheelMotorRight.setVelocity(0, percent);
     }
+
+    FlywheelMotorLeft.spin(vex::forward);
+    FlywheelMotorRight.spin(vex::forward);
 
     if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
       leftMotorSpeed = -FINE_TUNING_SPEED;
