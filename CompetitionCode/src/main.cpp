@@ -19,6 +19,9 @@
 // LeftBackMotor        motor         20              
 // RightFrontMotor      motor         1               
 // RightBackMotor       motor         2               
+// PistonMotor          motor         15              
+// FlywheelMotorLeft    motor         12              
+// FlywheelMotorRight   motor         14              
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -386,6 +389,28 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
+    if(Controller1.ButtonL1.pressing()){
+      PistonMotor.setVelocity(25, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      PistonMotor.setVelocity(-25, percent);
+    }
+    else{
+      PistonMotor.setVelocity(0, percent);
+    }
+
+    if(Controller1.ButtonR1.pressing()){
+      FlywheelMotorLeft.setVelocity(100, percent);
+      FlywheelMotorRight.setVelocity(100, percent);
+    }
+    else if(Controller1.ButtonR2.pressing()){
+      FlywheelMotorLeft.setVelocity(-100, percent);
+      FlywheelMotorRight.setVelocity(-100, percent);
+    }
+    else{
+      FlywheelMotorLeft.setVelocity(0, percent);
+      FlywheelMotorRight.setVelocity(0, percent);
+    }
 
     if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
       leftMotorSpeed = -FINE_TUNING_SPEED;
