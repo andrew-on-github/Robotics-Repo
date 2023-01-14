@@ -59,7 +59,7 @@ const int CONTROLLER_MATCHING_THRESHOLD = 25;
 const int FINE_TUNING_SPEED = 7;
 
 //speed the flywheel motors run at
-const int FLYWHEEL_SPEED = 75;
+const int FLYWHEEL_SPEED = 45;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
@@ -186,7 +186,13 @@ void controllerScreen(){
     }
     else{
       //make sure that the correct number of digits is printed for seconds
-      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
+      if(secondsRemaining >= 0){
+        Controller1.Screen.print("TIME: %d:0%d", minutesRemaining, secondsRemaining);
+      }
+      else{
+        Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
+      }
+
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
