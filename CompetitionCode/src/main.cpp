@@ -21,7 +21,7 @@
 // YellowLight          digital_out   B               
 // RedLight             digital_out   C               
 // IntakeMotor          motor         10              
-// FlywheelMotorLeft    motor         2               
+// FlywheelMotorLeft    motor         3               
 // FlywheelMotorRight   motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
