@@ -74,6 +74,9 @@ int brakingTimeRemaining = BRAKING_TIME;
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
 
+// flywheel spinning speed in percentages
+const int FLYWHEEL_SPEED = 80;
+
 //default deadzone value 
 //want this to be as low as possible without any drift
 //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
@@ -401,12 +404,12 @@ void usercontrol(void) {
     PistonMotor.spin(vex::forward);
 
     if(Controller1.ButtonR1.pressing()){
-      FlywheelMotorLeft.setVelocity(100, percent);
-      FlywheelMotorRight.setVelocity(100, percent);
+      FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
+      FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
     }
     else if(Controller1.ButtonR2.pressing()){
-      FlywheelMotorLeft.setVelocity(-100, percent);
-      FlywheelMotorRight.setVelocity(-100, percent);
+      FlywheelMotorLeft.setVelocity(-1 * FLYWHEEL_SPEED, percent);
+      FlywheelMotorRight.setVelocity(-1 * FLYWHEEL_SPEED, percent);
     }
     else{
       FlywheelMotorLeft.setVelocity(0, percent);
