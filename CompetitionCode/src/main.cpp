@@ -58,6 +58,9 @@ const int CONTROLLER_MATCHING_THRESHOLD = 25;
 //speed the motors run at when doing fine tuning control
 const int FINE_TUNING_SPEED = 7;
 
+//speed the flywheel motors run at
+const int FLYWHEEL_SPEED = 75;
+
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
 
@@ -381,12 +384,12 @@ void usercontrol(void) {
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
     if(Controller1.ButtonR2.pressing()){
-      FlywheelMotorLeft.setVelocity(100, percent);
-      FlywheelMotorRight.setVelocity(100, percent);
+      FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
+      FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
     }
     else if(Controller1.ButtonX.pressing()){
-      FlywheelMotorLeft.setVelocity(-100, percent);
-      FlywheelMotorRight.setVelocity(-100, percent);
+      FlywheelMotorLeft.setVelocity(-FLYWHEEL_SPEED, percent);
+      FlywheelMotorRight.setVelocity(-FLYWHEEL_SPEED, percent);
     }
     else{
       FlywheelMotorLeft.setVelocity(0, percent);
