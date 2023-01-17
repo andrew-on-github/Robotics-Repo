@@ -59,7 +59,7 @@ const int CONTROLLER_MATCHING_THRESHOLD = 25;
 const int FINE_TUNING_SPEED = 7;
 
 //speed the flywheel motors run at
-const int FLYWHEEL_SPEED = 45;
+const int FLYWHEEL_SPEED = 70;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
