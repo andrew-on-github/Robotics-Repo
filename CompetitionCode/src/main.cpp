@@ -15,8 +15,8 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftBackMotor        motor         12              
-// RightBackMotor       motor         8               
+// LeftBackMotor        motor         8               
+// RightBackMotor       motor         12              
 // GreenLight           digital_out   A               
 // YellowLight          digital_out   B               
 // RedLight             digital_out   C               
@@ -58,8 +58,11 @@ const int CONTROLLER_MATCHING_THRESHOLD = 25;
 //speed the motors run at when doing fine tuning control
 const int FINE_TUNING_SPEED = 7;
 
+//speed the intake motor runs at
+const int INTAKE_SPEED = 75;
+
 //speed the flywheel motors run at
-const int FLYWHEEL_SPEED = 70;
+const int FLYWHEEL_SPEED = 25;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
@@ -415,10 +418,10 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL2.pressing()){
-      IntakeMotor.setVelocity(100, percent);
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
     }
     else if(Controller1.ButtonUp.pressing()){
-      IntakeMotor.setVelocity(-100, percent);
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
     }
     else{
       IntakeMotor.setVelocity(0, percent);
