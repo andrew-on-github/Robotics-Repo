@@ -62,7 +62,7 @@ const int FINE_TUNING_SPEED = 7;
 const int INTAKE_SPEED = 75;
 
 //speed the flywheel motors run at
-const int FLYWHEEL_SPEED = 25;
+const int FLYWHEEL_SPEED = 100;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
