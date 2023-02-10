@@ -352,6 +352,10 @@ void autonomous(void) {
     switch(selectedAuto){
       case 0:
         break;
+        LeftBackMotor.spinFor(vex::fwd, 0.5, seconds);
+        RightBackMotor.spinFor(vex::fwd, 0.5, seconds);
+        
+        IntakeMotor.spin(vex::reverse, 100, percent);
       
       case 1:
         Brain.Screen.print("1");
@@ -421,7 +425,7 @@ void usercontrol(void) {
       IntakeMotor.setVelocity(INTAKE_SPEED, percent);
     }
     else if(Controller1.ButtonUp.pressing()){
-      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
+      IntakeMotor.setVelocity(-INTAKE_SPEED, percent);
     }
     else{
       IntakeMotor.setVelocity(0, percent);
