@@ -12,12 +12,12 @@ controller Controller1 = controller(primary);
 limit MenuCycle = limit(Brain.ThreeWirePort.D);
 limit MenuSelect = limit(Brain.ThreeWirePort.E);
 motor LeftFrontMotor = motor(PORT19, ratio6_1, false);
-motor LeftBackMotor = motor(PORT20, ratio6_1, false);
-motor RightFrontMotor = motor(PORT1, ratio6_1, true);
-motor RightBackMotor = motor(PORT2, ratio6_1, true);
-motor IntakeMotor = motor(PORT15, ratio18_1, false);
-motor FlywheelMotorLeft = motor(PORT12, ratio18_1, false);
-motor FlywheelMotorRight = motor(PORT14, ratio18_1, true);
+motor LeftBackMotor = motor(PORT1, ratio6_1, false);
+motor RightFrontMotor = motor(PORT17, ratio6_1, true);
+motor RightBackMotor = motor(PORT11, ratio6_1, true);
+motor FlywheelMotorLeft = motor(PORT8, ratio18_1, true);
+motor FlywheelMotorRight = motor(PORT9, ratio18_1, false);
+motor IntakeMotor = motor(PORT2, ratio18_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

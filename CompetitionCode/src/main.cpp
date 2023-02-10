@@ -16,12 +16,12 @@
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
 // LeftFrontMotor       motor         19              
-// LeftBackMotor        motor         20              
-// RightFrontMotor      motor         1               
-// RightBackMotor       motor         2               
-// IntakeMotor          motor         15              
-// FlywheelMotorLeft    motor         12              
-// FlywheelMotorRight   motor         14              
+// LeftBackMotor        motor         1               
+// RightFrontMotor      motor         17              
+// RightBackMotor       motor         11              
+// FlywheelMotorLeft    motor         8               
+// FlywheelMotorRight   motor         9               
+// IntakeMotor          motor         2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -75,7 +75,7 @@ int brakingTimeRemaining = BRAKING_TIME;
 const int USERCONTROL_TIME_SECONDS = 105;
 
 // flywheel spinning speed in percentages
-const int FLYWHEEL_SPEED = 80;
+const int FLYWHEEL_SPEED = 60;
 
 //intake spinning speed
 const int INTAKE_SPEED = 100;
@@ -395,14 +395,12 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
-    if(Controller1.ButtonR1.pressing()){
+
+    if(Controller1.ButtonR1.pressing() || Controller1.ButtonR2.pressing()){
       FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
       FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
     }
-    else if(Controller1.ButtonR2.pressing()){
-      FlywheelMotorLeft.setVelocity(-1 * FLYWHEEL_SPEED, percent);
-      FlywheelMotorRight.setVelocity(-1 * FLYWHEEL_SPEED, percent);
-    }
+
     else{
       FlywheelMotorLeft.setVelocity(0, percent);
       FlywheelMotorRight.setVelocity(0, percent);
@@ -420,6 +418,18 @@ void usercontrol(void) {
 
     FlywheelMotorLeft.spin(vex::forward);
     FlywheelMotorRight.spin(vex::forward);
+
+    if(Controller1.ButtonL1.pressing()){
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      IntakeMotor.setVelocity(-1 * INTAKE_SPEED, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
+    IntakeMotor.spin(vex::forward);
 
     if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
       leftMotorSpeed = -FINE_TUNING_SPEED;
