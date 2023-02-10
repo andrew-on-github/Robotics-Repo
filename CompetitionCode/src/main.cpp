@@ -19,7 +19,7 @@
 // LeftBackMotor        motor         20              
 // RightFrontMotor      motor         1               
 // RightBackMotor       motor         2               
-// PistonMotor          motor         15              
+// IntakeMotor          motor         15              
 // FlywheelMotorLeft    motor         12              
 // FlywheelMotorRight   motor         14              
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -76,6 +76,9 @@ const int USERCONTROL_TIME_SECONDS = 105;
 
 // flywheel spinning speed in percentages
 const int FLYWHEEL_SPEED = 80;
+
+//intake spinning speed
+const int INTAKE_SPEED = 100;
 
 //default deadzone value 
 //want this to be as low as possible without any drift
@@ -392,17 +395,6 @@ void usercontrol(void) {
       rightMotorSpeed = avgMotorSpeed;
     }
 
-    if(Controller1.ButtonL1.pressing()){
-      PistonMotor.setVelocity(25, percent);
-    }
-    else if(Controller1.ButtonL2.pressing()){
-      PistonMotor.setVelocity(-25, percent);
-    }
-    else{
-      PistonMotor.setVelocity(0, percent);
-    }
-    PistonMotor.spin(vex::forward);
-
     if(Controller1.ButtonR1.pressing()){
       FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
       FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
@@ -414,6 +406,16 @@ void usercontrol(void) {
     else{
       FlywheelMotorLeft.setVelocity(0, percent);
       FlywheelMotorRight.setVelocity(0, percent);
+    }
+
+    if(Controller1.ButtonL1.pressing()){
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      IntakeMotor.setVelocity(-1 * INTAKE_SPEED, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
     }
 
     FlywheelMotorLeft.spin(vex::forward);
