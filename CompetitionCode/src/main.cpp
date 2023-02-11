@@ -379,7 +379,7 @@ void autonomous(void) {
 
         
 
-        IntakeMotor.spinFor(vex::reverse, 0.3, rev);
+        IntakeMotor.spinFor(vex::reverse, 0.35, rev);
         
         wait(0.25, sec);
 
