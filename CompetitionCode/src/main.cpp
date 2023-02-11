@@ -13,13 +13,10 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// MenuCycle            limit         D               
-// MenuSelect           limit         E               
+// MenuCycle            limit         A               
+// MenuSelect           limit         B               
 // LeftBackMotor        motor         8               
 // RightBackMotor       motor         12              
-// GreenLight           digital_out   A               
-// YellowLight          digital_out   B               
-// RedLight             digital_out   C               
 // IntakeMotor          motor         10              
 // FlywheelMotor        motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
@@ -229,6 +226,7 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   
+
   //initializing selected auto to 0
   selectedAuto = 0;
 
@@ -348,21 +346,49 @@ void autonomous(void) {
   preauto = false;
 
   //enabling FlywheelMotorController
-  FlywheelMotorController.setEnabled(false);
+  FlywheelMotorController.setEnabled(true);
 
   Brain.Screen.print("Running Autonomous No. ");
   Controller1.Screen.print("AUTO");
 
     switch(selectedAuto){
       case 0:
+        Brain.Screen.print("0");
+        LeftBackMotor.spin(vex::forward, -25, percent);
+        RightBackMotor.spin(vex::forward, -25, percent);
+
+        wait(0.5, sec);
+
+        IntakeMotor.spin(vex::reverse, 15, percent);
+
+        wait(0.3, sec);
+
+        LeftBackMotor.stop();
+        RightBackMotor.stop();
+
+        wait(0.15, sec);
+
+        IntakeMotor.stop();
         break;
-        LeftBackMotor.spinFor(vex::fwd, 0.5, seconds);
-        RightBackMotor.spinFor(vex::fwd, 0.5, seconds);
-        
-        IntakeMotor.spin(vex::reverse, 100, percent);
-      
+
       case 1:
         Brain.Screen.print("1");
+        Brain.Screen.print("0");
+        LeftBackMotor.spin(vex::forward, -25, percent);
+        RightBackMotor.spin(vex::forward, -25, percent);
+
+        wait(0.5, sec);
+
+        IntakeMotor.spin(vex::reverse, 15, percent);
+
+        wait(0.3, sec);
+
+        LeftBackMotor.stop();
+        RightBackMotor.stop();
+
+        wait(0.45, sec);
+
+        IntakeMotor.stop();
         break;
 
       case 2:
