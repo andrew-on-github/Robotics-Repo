@@ -354,42 +354,37 @@ void autonomous(void) {
 
     switch(selectedAuto){
       case 0:
-        Brain.Screen.print("0");
-        LeftBackMotor.spin(vex::forward, -25, percent);
-        RightBackMotor.spin(vex::forward, -25, percent);
-
-        wait(0.5, sec);
-
-        IntakeMotor.spinFor(vex::reverse, 0.15, rev);
+       Brain.Screen.print("0");
+        LeftBackMotor.spin(vex::forward, -10, percent);
+        RightBackMotor.spin(vex::forward, -10, percent);
 
         wait(0.3, sec);
 
+        
+
+        IntakeMotor.spinFor(vex::reverse, 0.15, rev);
+        
+        wait(0.5, sec);
+
         LeftBackMotor.stop();
-        RightBackMotor.stop();
-
-        wait(0.15, sec);
-
-        IntakeMotor.stop();
+        RightBackMotor.stop(); 
         break;
 
       case 1:
         Brain.Screen.print("1");
-        LeftBackMotor.spin(vex::forward, -25, percent);
-        RightBackMotor.spin(vex::forward, -25, percent);
-
-        wait(0.5, sec);
-
-        IntakeMotor.spinFor(vex::reverse, 0.3, rev);
-
+        LeftBackMotor.spin(vex::forward, -10, percent);
+        RightBackMotor.spin(vex::forward, -10, percent);
 
         wait(0.3, sec);
 
+        
+
+        IntakeMotor.spinFor(vex::reverse, 0.3, rev);
+        
+        wait(0.5, sec);
+
         LeftBackMotor.stop();
-        RightBackMotor.stop();
-
-        wait(0.45, sec);
-
-        IntakeMotor.stop();
+        RightBackMotor.stop(); 
         break;
 
       case 2:
