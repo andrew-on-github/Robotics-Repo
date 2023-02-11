@@ -15,10 +15,10 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftFrontMotor       motor         19              
-// LeftBackMotor        motor         1               
-// RightFrontMotor      motor         17              
-// RightBackMotor       motor         11              
+// LeftFrontMotor       motor         11              
+// LeftBackMotor        motor         17              
+// RightFrontMotor      motor         1               
+// RightBackMotor       motor         19              
 // FlywheelMotorLeft    motor         8               
 // FlywheelMotorRight   motor         9               
 // IntakeMotor          motor         2               
