@@ -1,8 +1,9 @@
-//git main
+//git 35X2022
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim      */
+/*    Author:       Andrew Goad, Katie Caldwell, JD Francois, David Ntim,     */
+/*                  Jack Cataldo                                              */
 /*    Created:      Thu Sep 26 2019                                           */
 /*    Description:  Competition Template                                      */
 /*                                                                            */
@@ -14,21 +15,17 @@
 // Controller1          controller                    
 // MenuCycle            limit         D               
 // MenuSelect           limit         E               
-// LeftFrontMotor       motor         3               
-// LeftBackMotor        motor         1               
-// RightFrontMotor      motor         4               
-// RightBackMotor       motor         2               
-// ClampMotor           motor         6               
-// LiftPot              potV2         A               
-// LeftLiftMotor        motor         9               
-// RightLiftMotor       motor         10              
-// ClampPot             potV2         C               
+// LeftFrontMotor       motor         11              
+// LeftBackMotor        motor         17              
+// RightFrontMotor      motor         1               
+// RightBackMotor       motor         19              
+// FlywheelMotorLeft    motor         8               
+// FlywheelMotorRight   motor         9               
+// IntakeMotor          motor         2               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-
 #include "motor-controller.h"
-#include "position.h"
 
 using namespace vex;
 using namespace std;
@@ -56,91 +53,43 @@ vex::motor_group DriveMotorGroup(LeftFrontMotor, LeftBackMotor, RightFrontMotor,
 //global variable changed in preauton function in order to control which auton is run
 int selectedAuto = 0;
 
+//time before brakes activate in msec
+const int BRAKING_TIME = 750;
 
-//motor controller objects 
-MotorController* LiftMotorController;
-MotorController* ClampMotorController;
+//difference between controller thumbsticks before they lock together
+const int CONTROLLER_MATCHING_THRESHOLD = 10;
 
-PositionMonitor* RobotPosition;
+//speed the motors run at when doing fine tuning control
+const int FINE_TUNING_SPEED = 7;
 
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
-/*---------------------------------------------------------------------------*/
+//forward and backward fine tuning control additive constant
+const int FWD_BWD_ADD = 4;
 
-//global to count the number of actuations of clamp
-int clampActuations = 0;
-
-//const to decide the amount of time before braking starts. 1 braking time = 1 usercontrol 
-//loop cycle = .25 msec
-const int BRAKING_TIME = 500;
+//speed at which the motors run during aimAdjustment
+const double CURVE = 2.0; 
 
 //var to count amount of time reamining before breaking
-int brakingTimeReamining = BRAKING_TIME;
-
-//wheel circumfrence const
-const double WHEEL_CIRCUMFRENCE = 12.56637;
-
-//delta time constant
-const double DELTA_TIME = 10;
+int brakingTimeRemaining = BRAKING_TIME;
 
 //amount of time in teh user control portion of the match in seconds
 const int USERCONTROL_TIME_SECONDS = 105;
 
-// target angle of the lift
-const double LIFT_HIGH_POSITION = 205;
-const double LIFT_LOW_POSITION = 115;
+// flywheel spinning speed in percentages
+const int FLYWHEEL_SPEED = 60;
 
-const double CLAMP_OUT_POSITION = 187;
-const double CLAMP_IN_POSITION = 80;
+//intake spinning speed
+const int INTAKE_SPEED = 65;
 
-const double LIFT_TAU = 0.25;
-const double CLAMP_TAU = 2.5;
+//default deadzone value 
+//want this to be as low as possible without any drift
+//test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
+const int DEADZONE = 0;
 
-double liftTarget = LIFT_LOW_POSITION;
-double clampTarget = CLAMP_IN_POSITION;
-
-const double EPSILON = 1E-5;
-
-//declaring and initializing preauto flag
+//declaring and initializing preauto flag, set to false when pre autonomous is exited
 bool preauto = true;
-
-//declaring and initializing liftmotor group
-motor_group LiftMotor = motor_group(LeftLiftMotor, RightLiftMotor);
-
-const double MC_THRESHOLD_LIFT_UP = 10;
-const double MC_THRESHOLD_LIFT_DOWN = 1000000;
-
-/*
-void clampFSA(){
-  if(fabs(clampTarget - CLAMP_OUT_POSITION) < EPSILON){
-    clampTarget = CLAMP_IN_POSITION;
-  }
-  else{
-    clampTarget = CLAMP_OUT_POSITION;
-  }
-}*/
-
-//l2
-void liftFSA(){
-  if(fabs(liftTarget - LIFT_LOW_POSITION) < EPSILON) {
-    liftTarget = LIFT_HIGH_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_UP);
-  }
-  else if(fabs(liftTarget - LIFT_HIGH_POSITION) < EPSILON) {
-    liftTarget = LIFT_LOW_POSITION;
-    LiftMotorController-> setMaxSpeedThresh(MC_THRESHOLD_LIFT_DOWN);
-  }
-}
-
-int controllerCurve(int input, double curve){
+double controllerCurve(int input, double curve){
   
-  double dubInput = input;
+  double dubInput = fabs((double)input);
 
   dubInput /= 100;
 
@@ -149,10 +98,13 @@ int controllerCurve(int input, double curve){
   dubInput *= 100;
 
   if(input >= 0){
-    return (int)dubInput;
+    dubInput = (int)dubInput;
   }
-  return -((int)(fabs(dubInput)));
+  else{
+    dubInput = -1 * ((int)(dubInput));
+  }
 
+  return dubInput;
 }
 
 void controllerScreen(){
@@ -167,12 +119,13 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[6] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor, &LeftLiftMotor, &RightLiftMotor};
+  motor* motors[4] = {&LeftFrontMotor, &LeftBackMotor, &RightFrontMotor, &RightBackMotor};
 
   motor* hiMotor = 0;
-  const int WARNING_TEMP = 100; //temperature at which the brain throttles control
+  const int WARNING_TEMP = 65; //temperature at which the brain throttles control
 
   Brain.Timer.reset();
+  Controller1.Screen.clearScreen();
 
   while(true){
     //timer calculations
@@ -208,8 +161,6 @@ void controllerScreen(){
       }
     }
 
-
-
     //controller screen print commands
     //time takes precedence, followed by temp warning, followed by everything else
     Controller1.Screen.setCursor(0, 0);
@@ -234,29 +185,16 @@ void controllerScreen(){
       else if(hiMotor == motors[3]){
         Controller1.Screen.print("RB");
       }
-      else if(hiMotor == motors[4] || hiMotor == motors[5]){
-        Controller1.Screen.print("LM");
-      }
-      else if(hiMotor == motors[5]){
-        Controller1.Screen.print("CM");
-      }
       Controller1.Screen.print(" WARN");
       Controller1.Screen.newLine();
-      Controller1.Screen.print("%f °C", hiMotor->temperature(celsius));
+      Controller1.Screen.print("%.2f °C", hiMotor->temperature(celsius));
     }
     else{
       //make sure that the correct number of digits is printed for seconds
-      if(secondsRemaining < 10){
-        Controller1.Screen.print("TIME WARN");
-      }
-      else{
-        Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
-      }
+      Controller1.Screen.print("TIME: %d:%d", minutesRemaining, secondsRemaining);
       //print temperature values
       Controller1.Screen.newLine();
       Controller1.Screen.print("AVG/HI: %.2f:%.2f", avgTemp, hiTemp);
-      Controller1.Screen.newLine();
-      Controller1.Screen.print("ANGLE: %.2f", LiftPot.angle(degrees));
     }
 
 
@@ -272,7 +210,6 @@ void controllerScreen(){
 
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
-  printf("preauton begin \n");
   vexcodeInit();
   
   //initializing selected auto to 0
@@ -285,14 +222,9 @@ void pre_auton(void) {
   //true when autonomous is "locked in" false when still selecting
   bool selected = false;
 
-  //initializing motor controllers
-  printf("motorcontrollers initialized \n");
-  LiftMotorController = new MotorController(&LiftMotor, &LiftPot, &liftTarget, LIFT_TAU);
-  // ClampMotorController = new MotorController(&ClampMotor, &ClampPot, &clampTarget, CLAMP_TAU);
-
   //double buffering
   Brain.Screen.render(true, false);
-  printf("preauton loop entered\n");
+
   //preauto flag turns false when usercontrol or autonomous begins
   while(preauto){
     //if menucycle is pressed and auton is not locked in
@@ -397,11 +329,8 @@ void autonomous(void) {
   
   //updating flag to cause preauton method to exit
   preauto = false;
-  printf("autonomous begun\n");
-  LiftMotorController->setEnabled(true);
-  // ClampMotorController->setEnabled(true);
 
-  Brain.Screen.print("Robot under autonomous control. Please stand clear.");
+  Brain.Screen.print("Running Autonomous No. ");
   Controller1.Screen.print("AUTO");
 
     switch(selectedAuto){
@@ -424,9 +353,6 @@ void autonomous(void) {
         Brain.Screen.print("error");
         break;
     }
-  LiftMotorController->setEnabled(false);
-  // ClampMotorController->setEnabled(false);
-  printf("autonomous ended\n");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -440,7 +366,6 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  printf("usercontrol\n");
 
   new thread(controllerScreen);
 
@@ -450,115 +375,114 @@ void usercontrol(void) {
   //clearing screen of anything printed in pre-auto
   Brain.Screen.clearScreen();
 
-  //allowing motor controllers to control their motors
-  LiftMotorController->setEnabled(true);
-  // ClampMotorController->setEnabled(true);
-
-  //declaring and initializing last vars
-  bool l1Last = false;
-  bool r2Last = false;
-  bool l2Last = false;
-  bool rightLast = false;
-
-  //default deadzone value 
-  //want this to be as low as possible without any drift
-  //test by printing input from the stick when its totally neutral and set this as one above the highest number displayed
-  int deadzone = 3;
-
   //declaring motor speed vars
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
   int avgMotorSpeed = 0;
 
-  printf("usercontrol loop entered\n");
   // User control code here, inside the loop 
   while (true) {
 
     //initializing motorspeed variables
     leftMotorSpeed = Controller1.Axis3.position(percent);
     rightMotorSpeed = Controller1.Axis2.position(percent);
-    //if the absolute difference between the sticks is within 10, and they have the same sign
-    if((abs(leftMotorSpeed - rightMotorSpeed) <= 10)){
+    //if the absolute difference between the sticks is within 10, and they have the same sign, and neither of them are zero
+    if((abs(leftMotorSpeed - rightMotorSpeed) <= CONTROLLER_MATCHING_THRESHOLD) && rightMotorSpeed != 0 && leftMotorSpeed != 0){
       //set the motor outputs to the avg of the two
       avgMotorSpeed = ((leftMotorSpeed + rightMotorSpeed) / 2);
       leftMotorSpeed = avgMotorSpeed;
       rightMotorSpeed = avgMotorSpeed;
     }
 
+
+    if(Controller1.ButtonR1.pressing() || Controller1.ButtonR2.pressing()){
+      FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
+      FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
+    }
+
+    else{
+      FlywheelMotorLeft.setVelocity(0, percent);
+      FlywheelMotorRight.setVelocity(0, percent);
+    }
+
+    if(Controller1.ButtonL1.pressing()){
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      IntakeMotor.setVelocity(-1 * INTAKE_SPEED, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
+    FlywheelMotorLeft.spin(vex::forward);
+    FlywheelMotorRight.spin(vex::forward);
+
+    if(Controller1.ButtonL1.pressing()){
+      IntakeMotor.setVelocity(INTAKE_SPEED, percent);
+    }
+    else if(Controller1.ButtonL2.pressing()){
+      IntakeMotor.setVelocity(-1 * INTAKE_SPEED, percent);
+    }
+    else{
+      IntakeMotor.setVelocity(0, percent);
+    }
+
+    IntakeMotor.spin(vex::forward);
+
+    if(Controller1.ButtonLeft.pressing() && !Controller1.ButtonRight.pressing()){
+      leftMotorSpeed = -FINE_TUNING_SPEED;
+      rightMotorSpeed = FINE_TUNING_SPEED;
+    }
+    else if(!Controller1.ButtonLeft.pressing() && Controller1.ButtonRight.pressing()){
+      leftMotorSpeed = FINE_TUNING_SPEED;
+      rightMotorSpeed = -FINE_TUNING_SPEED;
+    }
+    else if(!Controller1.ButtonUp.pressing() && Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = -FINE_TUNING_SPEED + FWD_BWD_ADD;
+      rightMotorSpeed = -FINE_TUNING_SPEED + FWD_BWD_ADD;
+    }
+    else if(Controller1.ButtonUp.pressing() && !Controller1.ButtonDown.pressing()){
+      leftMotorSpeed = FINE_TUNING_SPEED + FWD_BWD_ADD;
+      rightMotorSpeed = FINE_TUNING_SPEED + FWD_BWD_ADD;
+    }
+    else{
+      leftMotorSpeed = controllerCurve(leftMotorSpeed, CURVE);
+      rightMotorSpeed = controllerCurve(rightMotorSpeed, CURVE);
+    }
+
     //LeftMotor: Left Stick with deadzone
-    if(abs(leftMotorSpeed) < deadzone) {
+    if(abs(leftMotorSpeed) <= DEADZONE && abs(rightMotorSpeed) <= DEADZONE) {
       //stopping if joystick within deadzone
       LeftBackMotor.setVelocity(0, percent);
       LeftFrontMotor.setVelocity(0, percent);
-      //sets motors to brake mode
-      if(brakingTimeReamining <= 0){
-        LeftBackMotor.stop(hold);
-        LeftFrontMotor.stop(hold);
-      }
-      else if(brakingTimeReamining > 0){
-        brakingTimeReamining--;
-      }
+      RightBackMotor.setVelocity(0, percent);
+      RightFrontMotor.setVelocity(0, percent);
+      brakingTimeRemaining -= 25;
     }
     else{
       //setting motor velocity
       LeftBackMotor.setVelocity(leftMotorSpeed, percent);
       LeftFrontMotor.setVelocity(leftMotorSpeed, percent);
-      brakingTimeReamining = BRAKING_TIME;
-    }
-
-    //same as above
-    if(abs(rightMotorSpeed) < deadzone) {
-      RightBackMotor.setVelocity(0, percent);
-      RightFrontMotor.setVelocity(0, percent);
-      if(brakingTimeReamining <= 0){
-        RightBackMotor.stop(hold);
-        RightFrontMotor.stop(hold);
-      }
-      else if(brakingTimeReamining >0 ){
-        brakingTimeReamining--;
-      }
-    }
-    else{
       RightBackMotor.setVelocity(rightMotorSpeed, percent);
       RightFrontMotor.setVelocity(rightMotorSpeed, percent);
-      brakingTimeReamining = BRAKING_TIME;
+      brakingTimeRemaining = BRAKING_TIME;
     }
 
-    //Lift: L2 Toggles between Low and target positions
-    //Right toggles target between the highest value and the target value
-    if(Controller1.ButtonL2.pressing() && !l2Last){
-      liftFSA();
-    }
-
-    //Clamp: R2 toggles
-    // if(Controller1.ButtonR2.pressing() && !r2Last){
-    //   clampFSA();
-    // }
-    if(Controller1.ButtonR2.pressing()){
-       ClampMotor.setVelocity(100, percent);
-    }  
-    else if(Controller1.ButtonR1.pressing()){
-      ClampMotor.setVelocity(-100, percent);
+    if(brakingTimeRemaining <= 0){
+        LeftBackMotor.stop(hold);
+        LeftFrontMotor.stop(hold);
+        RightBackMotor.stop(hold);
+        RightFrontMotor.stop(hold);
     }
     else{
-      ClampMotor.setVelocity(0, percent);
+      //spinning motors and activating hydraulics
+      LeftBackMotor.spin(fwd);
+      LeftFrontMotor.spin(fwd);
+      RightBackMotor.spin(fwd);
+      RightFrontMotor.spin(fwd);
     }
-
-    //spinning motors and activating hydraulics
-    LeftBackMotor.spin(fwd);
-    LeftFrontMotor.spin(fwd);
-    RightBackMotor.spin(fwd);
-    RightFrontMotor.spin(fwd);
-
-    ClampMotor.spin(fwd);
-    
-    //update clamplast so inputs arent counted multiple times
-    r2Last = Controller1.ButtonR2.pressing();
-    l2Last = Controller1.ButtonL2.pressing();
-    rightLast = Controller1.ButtonRight.pressing();
-    l1Last = Controller1.ButtonL1.pressing();
-
     //decrementing braking time so that brakes engage on time
     wait(25, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -570,19 +494,11 @@ void usercontrol(void) {
 //
 int main() {
   // Set up callbacks for autonomous and driver control periods.
-  printf("main callbacks \n");
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
-  printf("calling preauton\n");
   pre_auton();
-
-  // Prevent main from exiting with an infinite loop.
-  printf("main loop entered \n");
-  // while(true){
-  //   wait(25, msec);
-  // }
 }
 
 
