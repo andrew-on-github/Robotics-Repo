@@ -57,7 +57,7 @@ int selectedAuto = 0;
 const int BRAKING_TIME = 750;
 
 //difference between controller thumbsticks before they lock together
-const int CONTROLLER_MATCHING_THRESHOLD = 25;
+const int CONTROLLER_MATCHING_THRESHOLD = 10;
 
 //speed the motors run at when doing fine tuning control
 const int FINE_TUNING_SPEED = 7;
