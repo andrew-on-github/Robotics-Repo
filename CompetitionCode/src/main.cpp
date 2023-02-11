@@ -78,7 +78,7 @@ const int USERCONTROL_TIME_SECONDS = 105;
 const int FLYWHEEL_SPEED = 60;
 
 //intake spinning speed
-const int INTAKE_SPEED = 60;
+const int INTAKE_SPEED = 65;
 
 //default deadzone value 
 //want this to be as low as possible without any drift
