@@ -226,6 +226,7 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   
+  preauto = true;
 
   //initializing selected auto to 0
   selectedAuto = 0;
@@ -359,7 +360,7 @@ void autonomous(void) {
 
         wait(0.5, sec);
 
-        IntakeMotor.spin(vex::reverse, 15, percent);
+        IntakeMotor.spinFor(vex::reverse, 0.15, rev);
 
         wait(0.3, sec);
 
@@ -373,13 +374,13 @@ void autonomous(void) {
 
       case 1:
         Brain.Screen.print("1");
-        Brain.Screen.print("0");
         LeftBackMotor.spin(vex::forward, -25, percent);
         RightBackMotor.spin(vex::forward, -25, percent);
 
         wait(0.5, sec);
 
-        IntakeMotor.spin(vex::reverse, 15, percent);
+        IntakeMotor.spinFor(vex::reverse, 0.3, rev);
+
 
         wait(0.3, sec);
 
