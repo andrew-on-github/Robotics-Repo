@@ -36,7 +36,7 @@ competition Competition;
 double flywheelTargetSpeed = 0;
 
 MotorController FlywheelMotorController = MotorController(&FlywheelMotor, &flywheelTargetSpeed,
-                                                           0.75);
+                                                           0.9);
 
 // define your global instances of motors and other devices here
 //katie was here
