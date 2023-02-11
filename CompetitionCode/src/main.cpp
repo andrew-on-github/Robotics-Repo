@@ -66,7 +66,7 @@ const int FINE_TUNING_SPEED = 7;
 const int FWD_BWD_ADD = 4;
 
 //speed at which the motors run during aimAdjustment
-const double CURVE = 1.7; 
+const double CURVE = 2.0; 
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
