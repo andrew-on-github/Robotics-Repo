@@ -27,6 +27,9 @@ void controlMotor(void *arg) {
     if(mc->getEnabled()){
       mc->spinMotors(speed);
     }
+    else{
+      mc->spinMotors(0);
+    }
     wait(WAIT_TIME, msec);
   }
 }
@@ -80,6 +83,19 @@ MotorController::MotorController(motor_group *cm, potV2 *cPV2, double *tv,
   new thread(controlMotor, this);
 }
 
+MotorController::MotorController(motor *cm, double *tv,
+                                 double tau) {
+  controlledMotor = cm;
+  controlledMotorGroup = (motor_group*)NULL;
+  targetValue = tv;
+  this->tau = tau;
+  maxSpeedThresh = 1000000;
+
+  enabled = false;
+  
+  new thread(controlMotor, this);
+}
+
 void MotorController::setEnabled(bool b){
   enabled = b;
 }
@@ -103,8 +119,11 @@ double MotorController::getControlledValue() {
     if(controlledPotV2 != NULL){
       return controlledPotV2->angle(degrees); 
     }
-    else{
+    else if(controlledPot != NULL){
       return controlledPot->angle(degrees);
+    }
+    else{
+      return controlledMotor->velocity(percent);
     }
 }
 

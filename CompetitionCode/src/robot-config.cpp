@@ -17,8 +17,7 @@ digital_out GreenLight = digital_out(Brain.ThreeWirePort.A);
 digital_out YellowLight = digital_out(Brain.ThreeWirePort.B);
 digital_out RedLight = digital_out(Brain.ThreeWirePort.C);
 motor IntakeMotor = motor(PORT10, ratio18_1, false);
-motor FlywheelMotorLeft = motor(PORT3, ratio18_1, false);
-motor FlywheelMotorRight = motor(PORT4, ratio18_1, true);
+motor FlywheelMotor = motor(PORT4, ratio18_1, true);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

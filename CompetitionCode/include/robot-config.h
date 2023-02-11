@@ -12,8 +12,7 @@ extern digital_out GreenLight;
 extern digital_out YellowLight;
 extern digital_out RedLight;
 extern motor IntakeMotor;
-extern motor FlywheelMotorLeft;
-extern motor FlywheelMotorRight;
+extern motor FlywheelMotor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

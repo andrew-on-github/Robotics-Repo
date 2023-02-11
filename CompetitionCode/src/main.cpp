@@ -21,8 +21,7 @@
 // YellowLight          digital_out   B               
 // RedLight             digital_out   C               
 // IntakeMotor          motor         10              
-// FlywheelMotorLeft    motor         3               
-// FlywheelMotorRight   motor         4               
+// FlywheelMotor        motor         4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -33,6 +32,11 @@ using namespace std;
 
 // A global instance of competition
 competition Competition;
+
+double flywheelTargetSpeed = 0;
+
+MotorController FlywheelMotorController = MotorController(&FlywheelMotor, &flywheelTargetSpeed,
+                                                           0.75);
 
 // define your global instances of motors and other devices here
 //katie was here
@@ -111,7 +115,7 @@ void controllerScreen(){
   int secondsRemaining;
   
   //be sure to adjust
-  motor* motors[5] = {&LeftBackMotor, &RightBackMotor, &IntakeMotor, &FlywheelMotorLeft, & FlywheelMotorRight};
+  motor* motors[4] = {&LeftBackMotor, &RightBackMotor, &IntakeMotor, & FlywheelMotor};
 
   motor* hiMotor = 0;
   const int WARNING_TEMP = 65; //temperature at which the brain throttles control
@@ -177,10 +181,7 @@ void controllerScreen(){
         Controller1.Screen.print("IN");
       }
       else if(hiMotor == motors[3]){
-        Controller1.Screen.print("FL");
-      }
-      else if(hiMotor == motors[4]){
-        Controller1.Screen.print("FR");
+        Controller1.Screen.print("FLY");
       }
 
       Controller1.Screen.print(" WARN");
@@ -346,6 +347,9 @@ void autonomous(void) {
   //updating flag to cause preauton method to exit
   preauto = false;
 
+  //enabling FlywheelMotorController
+  FlywheelMotorController.setEnabled(false);
+
   Brain.Screen.print("Running Autonomous No. ");
   Controller1.Screen.print("AUTO");
 
@@ -409,16 +413,16 @@ void usercontrol(void) {
     rightMotorSpeed = Controller1.Axis2.position(percent);
 
     if(Controller1.ButtonR2.pressing()){
-      FlywheelMotorLeft.setVelocity(FLYWHEEL_SPEED, percent);
-      FlywheelMotorRight.setVelocity(FLYWHEEL_SPEED, percent);
+      flywheelTargetSpeed = FLYWHEEL_SPEED;
+      FlywheelMotorController.setEnabled(true);
     }
     else if(Controller1.ButtonX.pressing()){
-      FlywheelMotorLeft.setVelocity(-FLYWHEEL_SPEED, percent);
-      FlywheelMotorRight.setVelocity(-FLYWHEEL_SPEED, percent);
+      flywheelTargetSpeed = -FLYWHEEL_SPEED;
+      FlywheelMotorController.setEnabled(true);
     }
     else{
-      FlywheelMotorLeft.setVelocity(0, percent);
-      FlywheelMotorRight.setVelocity(0, percent);
+      flywheelTargetSpeed = 0;
+      FlywheelMotorController.setEnabled(false);
     }
 
     if(Controller1.ButtonL2.pressing()){
@@ -432,8 +436,7 @@ void usercontrol(void) {
     }
 
     IntakeMotor.spin(vex::forward);
-    FlywheelMotorLeft.spin(vex::forward);
-    FlywheelMotorRight.spin(vex::forward);
+    FlywheelMotor.spin(vex::forward);
 
     //if the absolute difference between the sticks is within 10, and they have the same sign, and neither of them are zero
     if((abs(leftMotorSpeed - rightMotorSpeed) <= CONTROLLER_MATCHING_THRESHOLD) && rightMotorSpeed != 0 && leftMotorSpeed != 0){

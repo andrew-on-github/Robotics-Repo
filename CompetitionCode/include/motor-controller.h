@@ -20,7 +20,7 @@ class MotorController {
     MotorController(motor* cm, pot* cP, double* tv, double tau);
     MotorController(motor* cm, potV2* cPV2, double* tv, double tau);
     MotorController(motor_group* cm, potV2* cPV2, double* tv, double tau);
-
+    MotorController(motor *cm, double* tv, double tau); 
     
     void spinMotors(int v);
 
