@@ -13,13 +13,10 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
-// MenuCycle            limit         D               
-// MenuSelect           limit         E               
+// MenuCycle            limit         A               
+// MenuSelect           limit         B               
 // LeftBackMotor        motor         8               
 // RightBackMotor       motor         12              
-// GreenLight           digital_out   A               
-// YellowLight          digital_out   B               
-// RedLight             digital_out   C               
 // IntakeMotor          motor         10              
 // FlywheelMotorLeft    motor         3               
 // FlywheelMotorRight   motor         4               
@@ -62,7 +59,7 @@ const int FINE_TUNING_SPEED = 7;
 const int INTAKE_SPEED = 75;
 
 //speed the flywheel motors run at
-const int FLYWHEEL_SPEED = 100;
+const int FLYWHEEL_SPEED = 75;
 
 //var to count amount of time reamining before breaking
 int brakingTimeRemaining = BRAKING_TIME;
@@ -351,11 +348,24 @@ void autonomous(void) {
 
     switch(selectedAuto){
       case 0:
+        Brain.Screen.print("0");
+        LeftBackMotor.spin(vex::forward, -25, percent);
+        RightBackMotor.spin(vex::forward, -25, percent);
+
+        wait(0.5, sec);
+
+        IntakeMotor.spin(vex::reverse, 15, percent);
+
+        wait(0.3, sec);
+
+        LeftBackMotor.stop();
+        RightBackMotor.stop();
+
+        wait(0.15, sec);
+
+        IntakeMotor.stop();
+
         break;
-        LeftBackMotor.spinFor(vex::fwd, 0.5, seconds);
-        RightBackMotor.spinFor(vex::fwd, 0.5, seconds);
-        
-        IntakeMotor.spin(vex::reverse, 100, percent);
       
       case 1:
         Brain.Screen.print("1");

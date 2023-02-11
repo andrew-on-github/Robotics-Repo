@@ -9,13 +9,10 @@ brain  Brain;
 
 // VEXcode device constructors
 controller Controller1 = controller(primary);
-limit MenuCycle = limit(Brain.ThreeWirePort.D);
-limit MenuSelect = limit(Brain.ThreeWirePort.E);
+limit MenuCycle = limit(Brain.ThreeWirePort.A);
+limit MenuSelect = limit(Brain.ThreeWirePort.B);
 motor LeftBackMotor = motor(PORT8, ratio6_1, false);
 motor RightBackMotor = motor(PORT12, ratio6_1, true);
-digital_out GreenLight = digital_out(Brain.ThreeWirePort.A);
-digital_out YellowLight = digital_out(Brain.ThreeWirePort.B);
-digital_out RedLight = digital_out(Brain.ThreeWirePort.C);
 motor IntakeMotor = motor(PORT10, ratio18_1, false);
 motor FlywheelMotorLeft = motor(PORT3, ratio18_1, false);
 motor FlywheelMotorRight = motor(PORT4, ratio18_1, true);
